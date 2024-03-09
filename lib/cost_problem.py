@@ -10,7 +10,7 @@ from lib.problem import Problem
 class CostProblem(Problem):
 	def __init__(self, buildings, objectiveFraction=0.95):
 		## Parameters
-		self.nObjectives	= 1
+		self.nObjectives	= 2
 		## Super constructor!
 		super().__init__(buildings, objectiveFraction)
 		
@@ -24,6 +24,7 @@ class CostProblem(Problem):
 			cost 		+= retrofit.cost
 			difference	+= retrofit.difference
 			i			+= 1
-		target 		= 0 if self.inequality < difference else self.inequality - difference
-		out["F"]	= [cost]
+		
+		target 		= 0 if self.inequality < difference else self.inequality - cost
+		out["F"]	= [cost/ difference, difference] 
 		out["G"]	= target

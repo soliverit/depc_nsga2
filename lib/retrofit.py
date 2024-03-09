@@ -5,3 +5,6 @@ class Retrofit():
 		self.efficiency		= efficiency
 		self.difference		= difference
 		self.impactRatio	= cost / difference if difference > 0 else 0
+	@property
+	def measureCount(self):
+		return self.description.measureCount
