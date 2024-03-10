@@ -4,27 +4,28 @@
 ##
 
 class RetrofitOption():
-	def __init__(self, description):
+	def __init__(self, description, measureCount):
 		self.description	= description
+		self.measureCount	= measureCount
 		self.costKey		= description + "-Cost"
 		self.efficiencyKey	= description + "-Eff"
 		
-RetrofitOption.ENVELOPES_HOTWATER_ROOF_WINDOWS 	= RetrofitOption("envelopes_hotwater_roof_windows")
-RetrofitOption.HOTWATER_ROOF_WINDOWS 			= RetrofitOption("hotwater_roof_windows")
-RetrofitOption.HOTWATER_ROOF 					= RetrofitOption("hotwater_roof")
-RetrofitOption.ROOF 							= RetrofitOption("roof")
-RetrofitOption.HOTWATER 						= RetrofitOption("hotwater")
-RetrofitOption.ROOF_WINDOWS 					= RetrofitOption("roof_windows")
-RetrofitOption.WINDOWS 							= RetrofitOption("windows")
-RetrofitOption.HOTWATER_WINDOWS 				= RetrofitOption("hotwater_windows")
-RetrofitOption.ENVELOPES_HOTWATER_ROOF 			= RetrofitOption("envelopes_hotwater_roof")
-RetrofitOption.ENVELOPES_ROOF 					= RetrofitOption("envelopes_roof")
-RetrofitOption.ENVELOPES 						= RetrofitOption("envelopes")
-RetrofitOption.ENVELOPES_HOTWATER 				= RetrofitOption("envelopes_hotwater")
-RetrofitOption.ENVELOPES_ROOF_WINDOWS 			= RetrofitOption("envelopes_roof_windows")
-RetrofitOption.ENVELOPES_WINDOWS 				= RetrofitOption("envelopes_windows")
-RetrofitOption.ENVELOPES_HOTWATER_WINDOWS 		= RetrofitOption("envelopes_hotwater_windows")
-RetrofitOption.AS_BUILT							= RetrofitOption("as_built")
+RetrofitOption.ENVELOPES_HOTWATER_ROOF_WINDOWS 	= RetrofitOption("envelopes_hotwater_roof_windows", 4)
+RetrofitOption.HOTWATER_ROOF_WINDOWS 			= RetrofitOption("hotwater_roof_windows", 3)
+RetrofitOption.HOTWATER_ROOF 					= RetrofitOption("hotwater_roof", 2)
+RetrofitOption.ROOF 							= RetrofitOption("roof", 1)
+RetrofitOption.HOTWATER 						= RetrofitOption("hotwater", 1)
+RetrofitOption.ROOF_WINDOWS 					= RetrofitOption("roof_windows", 2)
+RetrofitOption.WINDOWS 							= RetrofitOption("windows", 1)
+RetrofitOption.HOTWATER_WINDOWS 				= RetrofitOption("hotwater_windows", 2)
+RetrofitOption.ENVELOPES_HOTWATER_ROOF 			= RetrofitOption("envelopes_hotwater_roof", 3)
+RetrofitOption.ENVELOPES_ROOF 					= RetrofitOption("envelopes_roof", 2)
+RetrofitOption.ENVELOPES 						= RetrofitOption("envelopes", 1)
+RetrofitOption.ENVELOPES_HOTWATER 				= RetrofitOption("envelopes_hotwater", 2)
+RetrofitOption.ENVELOPES_ROOF_WINDOWS 			= RetrofitOption("envelopes_roof_windows", 3)
+RetrofitOption.ENVELOPES_WINDOWS 				= RetrofitOption("envelopes_windows", 2)
+RetrofitOption.ENVELOPES_HOTWATER_WINDOWS 		= RetrofitOption("envelopes_hotwater_windows", 3)
+RetrofitOption.AS_BUILT							= RetrofitOption("as_built", 0)
 RetrofitOption.RETROFIT_OPTION_DICTIONARY	= {
 	"envelopes_hotwater_roof_windows": 	RetrofitOption.ENVELOPES_HOTWATER_ROOF_WINDOWS, 
 	"hotwater_roof_windows": 			RetrofitOption.HOTWATER_ROOF_WINDOWS, 

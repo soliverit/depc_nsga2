@@ -1,3 +1,5 @@
+### Includes ###
+## Native
 import numpy as np
 from pymoo.core.problem import ElementwiseProblem
 
@@ -19,6 +21,7 @@ class Problem(ElementwiseProblem):
 			self.nObjectives	= 1
 		if not hasattr(self, "nInequalities"):
 			self.nInequalities	= 1
+		
 		super().__init__(n_var=len(lowerBounds),
 			n_obj=self.nObjectives,
 			n_ieq_constr=self.nInequalities,
