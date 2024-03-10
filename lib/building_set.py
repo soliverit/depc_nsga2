@@ -20,8 +20,10 @@ class BuildingSet():
 	### Instance stuff ###
 	def __init__(self):
 		self.buildings	= []
+		self.area 		= 0.0
 	def append(self, building):
 		self.buildings.append(building)
+		self.area += building.area
 	
 	def getByRating(self, rating):
 		set	= __class__()
@@ -37,6 +39,36 @@ class BuildingSet():
 					set.append(building)
 					break
 		return set
+	def retrofitCount(self):
+		count	= 0
+		for building in self.buildings:
+			count	+= building.retrofitCount
+		return count
+	def getCheapestToRating(self, rating):
+		cost			= 0.0
+		points			= 0.0
+		metPoints		= 0.0
+		highestCost		= 0.0
+		highestRatio	= 0.0
+		for building in self.buildings:
+			points		+= building.toRating("D")
+			retrofit	= building.getCheapestRetrofitToEfficiency(Building.ratingLowerBound("D"))
+			## Best case stuff
+			if retrofit:
+				cost 		+= retrofit.cost
+				metPoints	+= retrofit.difference
+				ratio		= retrofit.cost / retrofit.difference
+				if retrofit.cost > highestCost and ratio > highestRatio:
+					highestCost	= retrofit.cost
+					highestRatio = ratio
+					
+		return {
+			"metPoints": metPoints, 
+			"cost": cost, 
+			"points": points,
+			"highestCost": highestCost,
+			"highestRatio": highestRatio
+		}
 	def toRatingDifference(self, rating):
 		total	= 0
 		for building in self.buildings:
@@ -54,6 +86,12 @@ class BuildingSet():
 			if building.retrofitCount > 1:	# All buildings have zero-impact measure
 				buildings.append(building)
 		self.buildings	= buildings
+	##
+	#
+	##
+	def filterRetrofitsByCostAndRatio(self, cost, ratio):
+		for building in self.buildings:
+			building.filterRetrofitsByCostAndRatio(cost, ratio)	
 	### Properties ###
 	@property
 	def length(self):

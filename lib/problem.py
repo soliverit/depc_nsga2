@@ -6,7 +6,6 @@ class Problem(ElementwiseProblem):
 	def __init__(self, buildings, objectiveFraction=0.95):
 		## Set instance stuff
 		self.buildings	= buildings
-		
 		self.total		= float(sum([building.efficiency for building in buildings ]))	
 		self.inequality	= self.total * objectiveFraction
 		## Prepare stuff

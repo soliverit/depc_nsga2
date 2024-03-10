@@ -32,6 +32,7 @@ class Building():
 		## Set variables
 		self.data		= data
 		self.rating		= self.data["CURRENT_ENERGY_RATING"]
+		self.area		= float(self.data["TOTAL_FLOOR_AREA"])
 		self.efficiency	= efficiency
 		self.retrofits	= []
 		## Parse retrofits
@@ -47,6 +48,7 @@ class Building():
 		for key in RetrofitOption.RETROFIT_OPTION_KEYS:
 			retrofitOption	= RetrofitOption.RETROFIT_OPTION_DICTIONARY[key]
 			efficiency		= floor(float(self.data[retrofitOption.efficiencyKey]))
+			# Skip Retrofits that do less than 1 index point of improvement
 			if efficiency != -1 and efficiency > self.efficiency:
 				cost		= float(self.data[retrofitOption.costKey])
 				retrofit	= Retrofit(
@@ -80,6 +82,28 @@ class Building():
 			if retrofit.cost < cost or retrofit.impactRatio < ratio:
 				retrofits.append(retrofit)
 		self.retrofits	= retrofits
+	##
+	#
+	##
+	def filterByRatioCountOrder(self):
+		retrofits = [[],[], [], []]
+		for retrofit in self.retrofits:
+			if retrofit.measureCount == 0:
+				continue
+			retrofits[retrofit.measureCount - 1].append(retrofit)
+		for rowID1 in range(3):
+			row1	= retrofits[rowID1]
+			for rowID2 in range(3 - rowID1):
+				row2	= retrofits[rowID2 + rowID1]
+				for retrofitID in range(len(row1)):
+					retrofit1	= row1[retrofitID]
+					retrofit2	= row2[retrofitID]
+				for rID in range(len(row2)):
+					if retrofit1.cost < retrofit2.cost and retrofit1.difference <= retrofit2.difference:
+						print("%s %s %s %s" %(retrofit1.cost, retrofit2.cost, retrofit1.cost, retrofit2.cost))
+						
+			
+
 	##
 	# Get number of retrofits, including as-built
 	##
