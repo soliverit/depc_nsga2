@@ -51,7 +51,10 @@ class BuildingSet():
 		highestCost		= 0.0
 		highestRatio	= 0.0
 		for building in self.buildings:
-			points		+= building.toRating("D")
+			pointDiff	= building.toRating("D")
+			if pointDiff == 0:
+				continue
+			points		+= pointDiff
 			retrofit	= building.getCheapestRetrofitToEfficiency(Building.ratingLowerBound("D"))
 			## Best case stuff
 			if retrofit:
@@ -84,10 +87,13 @@ class BuildingSet():
 		buildings = []
 		for building in self:
 			if building.retrofitCount > 1:	# All buildings have zero-impact measure
+				
 				buildings.append(building)
+			else: 
+				print(building.data["LMK_KEY"])
 		self.buildings	= buildings
 	##
-	#
+	# Filter Retrofits with a cost and ratio greater than the inputs
 	##
 	def filterRetrofitsByCostAndRatio(self, cost, ratio):
 		for building in self.buildings:

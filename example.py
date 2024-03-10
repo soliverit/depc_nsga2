@@ -26,7 +26,8 @@ if not isfile(dataPath):
 #    The actual example     #
 #############################
 # Load data
-buildings			= BuildingSet.LoadDataSet(dataPath).getByRatings(["G", "F", "E", "D"])
+buildings			= BuildingSet.LoadDataSet(dataPath).getByRatings(["G", "F", "E"])
+buildingStats		= buildings.getCheapestToRating("D")
 # Prepare problem
 problem				= CostProblem(buildings)
 problem.inequality	= problem.buildings.toRatingDifference("D")
@@ -44,7 +45,7 @@ retrofitGA	= RetrofitNSGA2(problem,
 	mutationETA=params["mutationETA"],
 	population=params["population"],
 	children=params["children"],
-	callback= Historian() if params["callback"] else False,
+	callback=Historian() if params["historyPath"] else False,
 	verbose=params["verbose"]
 )
 retrofitGA.printBenchmark()

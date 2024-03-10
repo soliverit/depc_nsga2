@@ -1,6 +1,7 @@
 ### Includes ### 
 ## Native
 import argparse
+from time							import time
 from pymoo.algorithms.moo.nsga2 	import NSGA2
 from pymoo.operators.sampling.rnd	import IntegerRandomSampling
 from pymoo.operators.crossover.sbx 	import SBX
@@ -83,6 +84,8 @@ class RetrofitNSGA2():
 		params = {}
 		if self.callback:
 			params["callback"]	= self.callback
+		
+		start		= time()
 		self.lastResult	= minimize(
 			self.problem,
 			self.algorithm,
@@ -91,6 +94,7 @@ class RetrofitNSGA2():
 			verbose=self.verbose,
 			**params
 		)
+		self.time	= time() - start
 	##
 	# Get the results from the last process
 	##
@@ -108,12 +112,13 @@ class RetrofitNSGA2():
 	def printBenchmark(self):
 		results	= self.problem.buildings.getCheapestToRating("D")
 		print("--- Benchmark ---")
-		print("Buildings: %s" %(self.problem.buildings.length))
-		print("Target:    %s" %(self.problem.buildings.toRatingDifference("D")))
-		print("Met points %s" %(results["metPoints"]))
-		print("Cost:      %s" %(round(results["cost"])))
-		print("Points:    %s" %(results["points"]))
-		print("Ratio:     %s" %(round(results["cost"] / results["points"], 1)))
+		print("Buildings:      %s" %(self.problem.buildings.length))
+		print("Target:         %s" %(self.problem.buildings.toRatingDifference("D")))
+		print("Met points      %s" %(results["metPoints"]))
+		print("Cost:           %s" %(round(results["cost"])))
+		print("Effective cost: %s" %(round(results["cost"] * (results["points"] / results["metPoints"]))))
+		print("Points:         %s" %(results["points"]))
+		print("Ratio:          %s" %(round(results["cost"] / results["metPoints"], 1)))
 	def printResults(self):
 		if not self.lastResult:
 			print("No NSGA2 results found")
@@ -125,6 +130,7 @@ class RetrofitNSGA2():
 		print("Cost:   %s" %(round(cost)))
 		print("Points: %s" %(round(points)))
 		print("Ratio:  %s" %(round(cost / points, 2)))
+		print("Time:   %s" %(self.time))
 	def writeHistory(self, path):
 		if not path:
 			print("Error: Can't save history: No save path set")
@@ -136,7 +142,6 @@ class RetrofitNSGA2():
 	def ParseCMD():
 		parser = argparse.ArgumentParser(description="Domestic EPC retrofit strategy maker")
 		parser.add_argument("--code", type=str, help="Set the sample_data file code. E.g '11k' = './sample_data/11k.csv'")
-		parser.add_argument("--callback", help="Include callback: Basically, record history with Historian class", action="store_true")
 		parser.add_argument("--summary", help="Print these parameters", action="store_true")
 		parser.add_argument("--verbose", help="Enable NSGA2 console logging", action="store_true")
 		parser.add_argument("--crossover",  help="I tell it to use crossover", action="store_true")
@@ -153,7 +158,6 @@ class RetrofitNSGA2():
 		dataCode 		= args.code if args.code is not None else "mid"
 		nGens 			= args.gen if args.gen is not None else 100
 		crossover		= args.crossover
-		callback		= args.callback
 		crossoverETA	= args.crossover_eta if args.crossover_eta else 15.0
 		crossoverProb	= args.crossover_prob if args.crossover_prob else 0.9
 		mutationETA		= args.mutation_eta if args.mutation_eta else 8.0
@@ -178,7 +182,6 @@ class RetrofitNSGA2():
 			"dataCode":			dataCode,
 			"historyPath":		historyPath,
 			"generations":		nGens,
-			"callback":			callback,
 			"crossover":		crossover,
 			"crossoverETA":		crossoverETA,
 			"crossoverProb":	crossoverProb,

@@ -83,7 +83,7 @@ class Building():
 				retrofits.append(retrofit)
 		self.retrofits	= retrofits
 	##
-	#
+	# Work in progress, I guess. Pretty sure the idea was to remove  n+ 1 retrofits with higher ratios
 	##
 	def filterByRatioCountOrder(self):
 		retrofits = [[],[], [], []]
