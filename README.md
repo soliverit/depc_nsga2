@@ -16,7 +16,7 @@ The example is straightforward. Just run `python example.py`
 - Add `--summary` to see the NSGA-II and Problem configuration.
 - Add `-h` to list command line parameters
 #### Output
-Output from running `python example.py  --code 11k --gen 10000 --population 100 --children 60 --history-path ./test/water.csv --callback --crossover --crossover-eta 16.1 --crossover-prob 0.8460 --mutation-eta 5.22 --summary`
+Output from running `python example.py  --code 11k --gen 10000 --population 100 --children 60 --history-path ./test/water.csv --crossover --crossover-eta 16.1 --crossover-prob 0.8460 --mutation-eta 5.22 --summary`
 
 <img src="https://github.com/soliverit/depc_nsga2/assets/3307541/d0273235-bc44-4fd7-ad47-eb77cb3def6d)" alt="drawing" height="250"/>
    
