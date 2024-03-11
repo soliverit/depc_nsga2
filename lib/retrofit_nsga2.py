@@ -97,6 +97,11 @@ class RetrofitNSGA2():
 		self.time	= time() - start
 	##
 	# Get the results from the last process
+	#
+	# Output: Hash{
+	#		cost:	float total cost of selected Retrofits
+	#		points:	int total number of EPC points improved
+	#	}
 	##
 	def getResult(self):
 		cost 	= 0.0
@@ -109,6 +114,14 @@ class RetrofitNSGA2():
 			cost 		+= retrofit.cost
 			points		+= retrofit.difference
 		return {"cost": cost, "points": points}
+	##
+	# Print Problem summary and Benchmark
+	#
+	# The Benchmark: Our base target is to meet the cheapest possible strategy
+	# for all Buildings worse than the target. Primarily, we're interested in 
+	# the cost to point difference ratio, though the number of points targeted
+	# and number met by the cheapest Retrofit selection are also useful.
+	##
 	def printBenchmark(self):
 		results	= self.problem.buildings.getCheapestToRating("D")
 		print("--- Benchmark ---")
@@ -119,10 +132,12 @@ class RetrofitNSGA2():
 		print("Effective cost: %s" %(round(results["cost"] * (results["points"] / results["metPoints"]))))
 		print("Points:         %s" %(results["points"]))
 		print("Ratio:          %s" %(round(results["cost"] / results["metPoints"], 1)))
+	##
+	# I'm not even documenting this one. Does what it says on the tin
+	##
 	def printResults(self):
 		if not self.lastResult:
 			print("No NSGA2 results found")
-		
 		result	= self.getResult()
 		cost	= result["cost"]
 		points	= result["points"]

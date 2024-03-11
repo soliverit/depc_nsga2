@@ -25,29 +25,37 @@ retrofitGA	= RetrofitNSGA2(problem,
 	children=params["children"],
 	verbose=params["verbose"]
 )
+
 ### Define evaluation function
 def optimise(crossoverETA, crossoverProb, mutationETA):
 	global retrofitGA	# Yes, globals are dirty! Very convnient here
+	## Reconfigure the GA
 	retrofitGA.crossoverETA		= crossoverETA
 	retrofitGA.crossoverProb	= crossoverProb
 	retrofitGA.mutationETA		= mutationETA
+	# Run the GA
 	retrofitGA.run()
+	# Return the results. The bayes library maximises, so return a negative
 	results						= retrofitGA.getResult()
-	# The bayes library maximises, so return a negative
 	return - int(round(results["cost"] / results["points"]))
+
+### Let's do it! ###
+# Define the NSGA parameters that'are being tuned. These are for PM crossover and SBX mutation
 bounds			= {
 	"crossoverProb":(0.7,0.9),
 	"crossoverETA": (10, 25),
 	"mutationETA": (5, 10)
 }
+# Define the optimiser
 optimiser	= BayesianOptimization(
 	f=optimise,
 	pbounds=bounds,
 	random_state=1,
 )
+# Run the optimiser. There's no minimise function
 optimiser.maximize(
 	init_points=5,
 	n_iter=200,
 )
-# Create the Bayes optimiser
+
 

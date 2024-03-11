@@ -2,14 +2,15 @@
 # Why do I exist? It's memory efficient to have a single option
 # shared by many than a string description for each Retrofit.
 ##
-
 class RetrofitOption():
 	def __init__(self, description, measureCount):
-		self.description	= description
-		self.measureCount	= measureCount
-		self.costKey		= description + "-Cost"
-		self.efficiencyKey	= description + "-Eff"
-		
+		self.description	= description			# Something that describes the Retrofit: Keywords in this example
+		self.measureCount	= measureCount			# Number of measures in the Retrofit
+		self.costKey		= description + "-Cost"	# CSV file cost column name
+		self.efficiencyKey	= description + "-Eff"	# CSV file EPC efficiency column name
+##
+# Since we know the entire set, it's easier just to define them all in static variables.
+##
 RetrofitOption.ENVELOPES_HOTWATER_ROOF_WINDOWS 	= RetrofitOption("envelopes_hotwater_roof_windows", 4)
 RetrofitOption.HOTWATER_ROOF_WINDOWS 			= RetrofitOption("hotwater_roof_windows", 3)
 RetrofitOption.HOTWATER_ROOF 					= RetrofitOption("hotwater_roof", 2)
@@ -26,6 +27,9 @@ RetrofitOption.ENVELOPES_ROOF_WINDOWS 			= RetrofitOption("envelopes_roof_window
 RetrofitOption.ENVELOPES_WINDOWS 				= RetrofitOption("envelopes_windows", 2)
 RetrofitOption.ENVELOPES_HOTWATER_WINDOWS 		= RetrofitOption("envelopes_hotwater_windows", 3)
 RetrofitOption.AS_BUILT							= RetrofitOption("as_built", 0)
+##
+# Static variables are cool, but dictionaries are cooler - or convenient. Either way.
+##
 RetrofitOption.RETROFIT_OPTION_DICTIONARY	= {
 	"envelopes_hotwater_roof_windows": 	RetrofitOption.ENVELOPES_HOTWATER_ROOF_WINDOWS, 
 	"hotwater_roof_windows": 			RetrofitOption.HOTWATER_ROOF_WINDOWS, 
@@ -44,6 +48,9 @@ RetrofitOption.RETROFIT_OPTION_DICTIONARY	= {
 	"envelopes_hotwater_windows": 		RetrofitOption.ENVELOPES_HOTWATER_WINDOWS,
 	"as_built":							RetrofitOption.AS_BUILT
 }
+##
+# We shouldn't have to know what exists, personally. Just where we can find out. Which is here.
+##
 RetrofitOption.RETROFIT_OPTION_KEYS			= [
 	"envelopes_hotwater_roof_windows",
 	"hotwater_roof_windows",

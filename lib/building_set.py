@@ -21,16 +21,39 @@ class BuildingSet():
 	def __init__(self):
 		self.buildings	= []
 		self.area 		= 0.0
+	##
+	# Add a building to the set
+	#
+	# Params:
+	#  building:	Building
+	#	
+	# Output:	BuildingSet
+	##
 	def append(self, building):
 		self.buildings.append(building)
 		self.area += building.area
-	
+	##
+	# Create a new set of Buildings with the target rating (A - G)
+	#
+	# Params:
+	# rating:	String EPC rating A through G
+	#
+	# Output:	BuildingSet
+	##
 	def getByRating(self, rating):
 		set	= __class__()
 		for building in self.buildings:
 			if building.rating == rating:
 				set.append(building)
 		return set
+	##
+	# Create a new set of Buildings with one of the target ratings (A - G)
+	#
+	# Params:
+	# rating:	[]String EPC ratings A through G
+	#
+	# Output:	BuildingSet
+	##
 	def getByRatings(self, ratings):
 		set	= __class__()
 		for building in self.buildings:
@@ -39,39 +62,63 @@ class BuildingSet():
 					set.append(building)
 					break
 		return set
+	##
+	# Get the number of Retrofits for all Buildings
+	#
+	# Output:	Integer Retrofit count, including do-nothing
+	##
 	def retrofitCount(self):
 		count	= 0
 		for building in self.buildings:
 			count	+= building.retrofitCount
 		return count
+	##
+	# Find cheapest to target rating Retrofits and aggregate findings.
+	#
+	# For each Building: If the Building is worse than the target rating,
+	# find the cheapest measure that brings it to at least the target. If it 
+	# doesn't have one, skip the Building. Aggregate the costs and EPC points
+	#
+	# Output:	Hash{
+	#			cost:		float Sum of identified Retrofit implemnetation costs
+	#			points:		int Target points reduction (all worse building regardless of if Retrofit is found)
+	#			metPoints:	int Points actually reduce by the identified Retrofits
+	# 		}
+	#
+	# Params:
+	# rating:	String EPC rating A through G
+	#
+	# Output:	BuildingSet
+	##
 	def getCheapestToRating(self, rating):
 		cost			= 0.0
 		points			= 0.0
 		metPoints		= 0.0
-		highestCost		= 0.0
-		highestRatio	= 0.0
 		for building in self.buildings:
+			# Get score, skip buildings that are at least the target rating
 			pointDiff	= building.toRating("D")
 			if pointDiff == 0:
 				continue
 			points		+= pointDiff
+			## Look for the cheapest, if any, Retrofit for the building
 			retrofit	= building.getCheapestRetrofitToEfficiency(Building.ratingLowerBound("D"))
-			## Best case stuff
 			if retrofit:
 				cost 		+= retrofit.cost
 				metPoints	+= retrofit.difference
 				ratio		= retrofit.cost / retrofit.difference
-				if retrofit.cost > highestCost and ratio > highestRatio:
-					highestCost	= retrofit.cost
-					highestRatio = ratio
-					
 		return {
 			"metPoints": metPoints, 
 			"cost": cost, 
-			"points": points,
-			"highestCost": highestCost,
-			"highestRatio": highestRatio
+			"points": points
 		}
+	##
+	# Get the number of EPC points required to raise all Buildings to the target rating.
+	#
+	# params:
+	#	rating:	String EPC rating (A through G)
+	#
+	# Output:	Int total EPC points
+	##
 	def toRatingDifference(self, rating):
 		total	= 0
 		for building in self.buildings:
@@ -115,5 +162,5 @@ class BuildingSet():
 			self._iter_index += 1
 			return result
 		else:
-			# StopIteration is raised to signal the end of the iteration
+			# Let the caller know the iteration is over
 			raise StopIteration

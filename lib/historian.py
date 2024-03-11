@@ -17,5 +17,9 @@ class Historian(Callback):
 	def __init__(self):
 		super().__init__()
 		self.optimals	= []
+	##
+	# All we're interested in is the optimised Objectives' values. In the case of 
+	# the example, the cost to point difference ratio and point difference
+	##
 	def notify(self, algorithm):
 		self.optimals.append(algorithm.opt[0].F)

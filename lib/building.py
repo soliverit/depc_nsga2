@@ -75,6 +75,10 @@ class Building():
 		self.retrofits.append(retrofit)
 	##
 	# Remov Retrofits with a cost and ratio greater than the inputs
+	#
+	# Params:
+	#	cost:	float highest acceptable cost
+	#	ratio:	float highest acceptable ratio
 	##
 	def filterRetrofitsByCostAndRatio(self, cost, ratio):
 		retrofits	= []
@@ -82,28 +86,7 @@ class Building():
 			if retrofit.cost < cost or retrofit.impactRatio < ratio:
 				retrofits.append(retrofit)
 		self.retrofits	= retrofits
-	##
-	# Work in progress, I guess. Pretty sure the idea was to remove  n+ 1 retrofits with higher ratios
-	##
-	def filterByRatioCountOrder(self):
-		retrofits = [[],[], [], []]
-		for retrofit in self.retrofits:
-			if retrofit.measureCount == 0:
-				continue
-			retrofits[retrofit.measureCount - 1].append(retrofit)
-		for rowID1 in range(3):
-			row1	= retrofits[rowID1]
-			for rowID2 in range(3 - rowID1):
-				row2	= retrofits[rowID2 + rowID1]
-				for retrofitID in range(len(row1)):
-					retrofit1	= row1[retrofitID]
-					retrofit2	= row2[retrofitID]
-				for rID in range(len(row2)):
-					if retrofit1.cost < retrofit2.cost and retrofit1.difference <= retrofit2.difference:
-						print("%s %s %s %s" %(retrofit1.cost, retrofit2.cost, retrofit1.cost, retrofit2.cost))
-						
-			
-
+	### Properties
 	##
 	# Get number of retrofits, including as-built
 	##
@@ -112,7 +95,13 @@ class Building():
 		return len(self.retrofits)
 	### Retrofit stuff ###
 	##
-	# Find cheapest option to get to the target efficiency
+	# Find cheapest option to get to the target efficiency.
+	#
+	# Params:
+	#	efficiency:	int minimum EPC efficiency
+	#
+	# Output:
+	#	Retrofit the cheapest to meet the efficiency OR bool False, no Retrofit found
 	##
 	def getCheapestRetrofitToEfficiency(self, efficiency):
 		result	= False
