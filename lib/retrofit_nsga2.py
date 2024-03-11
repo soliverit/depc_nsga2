@@ -43,14 +43,14 @@ class RetrofitNSGA2():
 	# output:	SBX
 	##
 	def createCrossoverModel(self):
-		return self.crossoverModel(**{"prob": self.crossoverProb, "eta": self.crossoverETA})
+		return self.crossoverModel(prob=self.crossoverProb, eta=self.crossoverETA)
 	##
 	# Create mutation model
 	# 
 	# output:	PolynomialMutation (PM)
 	##
 	def createMutationModel(self):
-		return self.mutationModel(**{"eta": self.mutationETA})
+		return self.mutationModel(eta=self.mutationETA)
 	##
 	# Create algorithm
 	#
