@@ -6,6 +6,9 @@ from lib.retrofit_nsga2		import RetrofitNSGA2
 from lib.building_set		import BuildingSet
 from lib.cost_problem		import CostProblem
 
+###
+# Bayesian optimisation: Tune hyperparameters of NSGA-II using Bayes theorem
+##
 ### Define stuff ###
 # Get command line parameters: call "python bayes_optimiser.py -h for details"
 params				= RetrofitNSGA2.ParseCMD()
