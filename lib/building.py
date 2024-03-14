@@ -57,7 +57,9 @@ class Building():
 					round(efficiency),
 					round(efficiency - self.efficiency)
 				)
-				self.addRetrofit(retrofit)
+				if retrofit.impactRatio < 600:
+					self.addRetrofit(retrofit)
+		self.retrofits	= sorted(self.retrofits, key=lambda x: x.impactRatio)
 	def toRating(self, rating):
 		target	= Building.RATING_BRACKETS[rating]["lower"]
 		if self.efficiency < target:
@@ -76,6 +78,12 @@ class Building():
 	##
 	# Remov Retrofits with a cost and ratio greater than the inputs
 	#
+	def filterRetrofitsByImpactRatio(self, threshold):
+		retrofits	= []
+		for retrofit in self.retrofits:
+			if retrofit.impactRatio < threshold:
+				retrofits.append(retrofit)
+		self.retrofits	= retrofits
 	# Params:
 	#	cost:	float highest acceptable cost
 	#	ratio:	float highest acceptable ratio
@@ -111,3 +119,11 @@ class Building():
 				result	= retrofit
 				cost	= retrofit.cost
 		return result
+	def getCheapestRetrofitToEfficiencyID(self, efficiency):
+		retrofitID	= 0
+		cost 	= 9999999999999
+		for idx in range(len(self.retrofits)):
+			retrofit	= self.retrofits[idx]
+			if retrofit.efficiency >= efficiency and retrofit.cost <  cost:
+				retrofitID	= idx
+		return retrofitID

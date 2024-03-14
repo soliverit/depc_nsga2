@@ -3,7 +3,6 @@
 
 ## Project
 from lib.problem import Problem
-
 ##
 # Cost problem: A problem with cost inequality
 ##

@@ -58,5 +58,5 @@ class Problem(ElementwiseProblem):
 			difference	+= retrofit.difference
 			i			+= 1
 		target 		= 0 if self.inequality < difference else self.inequality - difference
-		out["F"]	= [cost]
+		out["F"]	= [cost / difference, difference]
 		out["G"]	= target

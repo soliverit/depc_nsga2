@@ -10,9 +10,9 @@ class BuildingSet():
 	def LoadDataSet(path):
 		buildings	= __class__()
 		with open(path, 'r') as file:
-			csv_reader = csv.DictReader(file)
+			csvReader = csv.DictReader(file)
 			# Iterate over each row in the CSV file
-			for row in csv_reader:
+			for row in csvReader:
 				# 'row' is a list containing the values of each column in the current row
 				building	= Building(row, float(row["CURRENT_ENERGY_EFFICIENCY"]))
 				buildings.append(building)
@@ -21,6 +21,16 @@ class BuildingSet():
 	def __init__(self):
 		self.buildings	= []
 		self.area 		= 0.0
+	##
+	# Write to file
+	##
+	def writeFile(self, path):
+		with open(path, "w") as csvfile:
+			columnNames	= list(self.buildings[0].data)
+			writer = csv.DictWriter(csvfile, fieldnames=columnNames)
+			writer.writeheader()
+			for building in self.buildings:
+				writer.writerow(building.data)
 	##
 	# Add a building to the set
 	#
@@ -73,6 +83,16 @@ class BuildingSet():
 			count	+= building.retrofitCount
 		return count
 	##
+	#
+	##
+	def partition(self, count):
+		sets = [BuildingSet() for x in range(count)]
+		counter = count
+		for building in self.buildings:
+			sets[counter % count].append(building)
+			counter += 1
+		return sets
+	##
 	# Find cheapest to target rating Retrofits and aggregate findings.
 	#
 	# For each Building: If the Building is worse than the target rating,
@@ -111,6 +131,29 @@ class BuildingSet():
 			"cost": cost, 
 			"points": points
 		}
+	def getCheapestToRatingState(self, rating):
+		state	= []
+		for building in self.buildings:
+			# Get score, skip buildings that are at least the target rating
+			pointDiff	= building.toRating("D")
+			if pointDiff == 0:
+				state.append(0)
+			## Look for the cheapest, if any, Retrofit for the building
+			stateID	= building.getCheapestRetrofitToEfficiencyID(Building.ratingLowerBound("D"))
+			if stateID:
+				state.append(stateID)
+			else:
+				state.append(stateID)
+		return state
+	def scoreState(self, state):
+		cost	= 0
+		points	= 0
+		for building in self.buildings:
+			retrofit	= building.getCheapestRetrofitToEfficiency(Building.ratingLowerBound("D"))
+			if retrofit:
+				cost 	+= retrofit.cost
+				points	+= retrofit.difference
+		return {"cost": cost, "points": points}
 	##
 	# Get the number of EPC points required to raise all Buildings to the target rating.
 	#
@@ -126,7 +169,20 @@ class BuildingSet():
 			if difference > 0:
 				total += difference
 		return total
+	##
+	# Merge set (Shallow clone for read-only stuff (or whatever, am no your mum.))
+	##
+	def merge(self, otherSet):
+		for building in otherSet:
+			self.append(building)
+			
 	### Filters ###
+	##
+	# Filter Retrofits by impact ratio
+	##
+	def filterRetrofitsByImpactRatio(self, threshold):
+		for building in self.buildings:
+			building.filterRetrofitsByImpactRatio(threshold)
 	##
 	# Remove buildings with no impactful Retrofits
 	##
@@ -134,10 +190,7 @@ class BuildingSet():
 		buildings = []
 		for building in self:
 			if building.retrofitCount > 1:	# All buildings have zero-impact measure
-				
 				buildings.append(building)
-			else: 
-				print(building.data["LMK_KEY"])
 		self.buildings	= buildings
 	##
 	# Filter Retrofits with a cost and ratio greater than the inputs
@@ -149,6 +202,7 @@ class BuildingSet():
 	@property
 	def length(self):
 		return len(self.buildings)
+	
 	### Maigc... Methods ###
 	def __iter__(self):
 		# This method returns an iterator object
@@ -164,3 +218,8 @@ class BuildingSet():
 		else:
 			# Let the caller know the iteration is over
 			raise StopIteration
+	##
+	# Get building
+	##
+	def __getitem__(self, buildingID):
+		return self.buildings[buildingID]
