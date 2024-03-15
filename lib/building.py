@@ -57,8 +57,7 @@ class Building():
 					round(efficiency),
 					round(efficiency - self.efficiency)
 				)
-				if retrofit.impactRatio < 600:
-					self.addRetrofit(retrofit)
+				self.addRetrofit(retrofit)
 		self.retrofits	= sorted(self.retrofits, key=lambda x: x.impactRatio)
 	def toRating(self, rating):
 		target	= Building.RATING_BRACKETS[rating]["lower"]
