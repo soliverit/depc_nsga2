@@ -1,11 +1,13 @@
 ### Include ###
 ## Native
+from argparse					import ArgumentParser
 from os.path					import isfile, isdir
 from os							import mkdir
 from time						import time, sleep
 ## Project
 from lib.nsga2_process_thread	import NSGA2ProcessThread
 from lib.building_set			import BuildingSet
+from lib.retrofit_nsga2			import RetrofitNSGA2
 ##
 # NSGA2 Community: Threading-based  stratified optimisation
 ##
@@ -64,12 +66,13 @@ class NSGA2Community():
 				##
 				# Queue up and start the next thread then update the alias counter
 				##
+				flags = self.flags + " --history-path ./test/shoe/" + str(counter) + ".csv"
 				if len(buildingSets) > 0:
 					buildingThread	= NSGA2ProcessThread(
 						buildingSets.pop(),
 						self.dataDirectory,
 						str(counter),
-						flags=self.flags
+						flags=flags
 					)
 					buildingThread.start()
 					self.buildingThreads.append(buildingThread)
@@ -93,5 +96,67 @@ class NSGA2Community():
 		print("Time: %s" %(time() - start))
 		print("WARNING!!!! You're writing to and from a dictionary with key control. Will break Retrofit relationships")
 		return buildingSet
+	##
+	# Parse command line arguments: Extends RetrofitNSGA2.ParseCMD()
+	##
+	@staticmethod
+	def ParseCMD():
+		parser = ArgumentParser(description="Domestic EPC retrofit strategy maker")
+		parser.add_argument("--code", type=str, help="Set the sample_data file code. E.g '11k' = './sample_data/11k.csv'")
+		parser.add_argument("--summary", help="Print these parameters", action="store_true")
+		parser.add_argument("--verbose", help="Enable NSGA2 console logging", action="store_true")
+		parser.add_argument("--silent", help="Don't write results to console", action="store_true")
+		parser.add_argument("--crossover",  help="I tell it to use crossover", action="store_true")
+		parser.add_argument("--crossover-eta", type=float, help="Set crossover eta")
+		parser.add_argument("--crossover-prob", type=float, help="Set crossover prob")
+		parser.add_argument("--mutation-eta", type=float, help="Set mutation eta")
+		parser.add_argument("--gen", type=int, help="Set number of generations")
+		parser.add_argument("--population", type=int, help="Set population size")
+		parser.add_argument("--children", type=int, help="Set number of children")
+		parser.add_argument("--best-initial-states", help="Use cheapest building-locked as the intial states", action="store_true")
+		parser.add_argument("--write-state", help="Append results to the BuildingSet and write new file", action="store_true")
+		parser.add_argument("--history-path", type=str, help="Where to write the CSV results?")
+		parser.add_argument("--target-rating", type=str, help="Minimum EPC rating that defines the GA constraint")
+		parser.add_argument("--threads", type=int, help="Number of concurrent RetrofitNSGA2 threads")
+		parser.add_argument("--partitions", type=int, help="Number of BuilingSet subsets processed by the threads")
+		
+		# Parse
+		args 		= parser.parse_args()
+		# Set values
+		dataCode 			= args.code if args.code is not None else "mid"
+		nGens 				= args.gen if args.gen is not None else 100
+		crossover			= args.crossover
+		crossoverETA		= args.crossover_eta if args.crossover_eta else 15.0
+		crossoverProb		= args.crossover_prob if args.crossover_prob else 0.9
+		mutationETA			= args.mutation_eta if args.mutation_eta else 8.0
+		population			= args.population if args.population else 40
+		children			= args.children if args.children else 20
+		historyPath			= args.history_path if args.history_path else False
+		targetRating		= args.target_rating if args.target_rating else "D"
+		threads				= args.threads if args.threads else 2
+		partitions			= args.partitions if args.partitions else 2
+		verbose				= args.verbose
+		writeState			= args.write_state
+		silent				= args.silent
+		bestInitalStates	= args.best_initial_states
 
+		# Print config
+		return {
+			"dataCode":				dataCode,
+			"historyPath":			historyPath,
+			"generations":			nGens,
+			"crossover":			crossover,
+			"crossoverETA":			crossoverETA,
+			"crossoverProb":		crossoverProb,
+			"mutationETA":			mutationETA,
+			"population":			population,
+			"children":				children,
+			"verbose":				verbose,
+			"bestInitialStates":	bestInitalStates,
+			"writeState":			writeState,
+			"silent":				silent,
+			"targetRating":			targetRating,
+			"threads":				threads,
+			"partitions":			partitions
+		}
 
