@@ -20,11 +20,12 @@ class NSGA2Community():
 	#	threadCount:	integer number of concurrent threads
 	#	flags:			string command line arguments for nsga2.py
 	## 
-	def __init__(self, buildings, dataDirectory, partitions=8, threadCount=4, flags=""):
+	def __init__(self, buildings, dataDirectory, partitions=8, threadCount=4, inequality=False,flags=""):
 		self.buildings			= buildings				# BuildingSet
 		self.dataDirectory		= dataDirectory + "/"	# Directory where files are saved
 		self.partitions			= partitions			# Number of BuildingSets
 		self.threadCount		= threadCount			# Number of concurrent threads
+		self.inequality			= inequality			# float / bool explicitly define global minimum EPC improvement constraint
 		self.flags				= flags					# nsga2.py flags
 		self.buildingThreads	= []					# Active NSGA2ProcessingThread
 		self.finishedThreads	= []					# Finished NSGA2ProcessingThread
@@ -66,7 +67,9 @@ class NSGA2Community():
 				##
 				# Queue up and start the next thread then update the alias counter
 				##
-				flags = self.flags + " --history-path ./test/shoe/" + str(counter) + ".csv"
+				flags = self.flags + " --history-path ./test/shoe/%s.csv" %(str(counter))
+				if self.inequality:
+					flags += " --inequality %s" %(int(self.inequality / self.partitions))
 				if len(buildingSets) > 0:
 					buildingThread	= NSGA2ProcessThread(
 						buildingSets.pop(),
@@ -90,12 +93,8 @@ class NSGA2Community():
 		buildingSet	= BuildingSet()
 		for thread in self.finishedThreads:
 			buildingSet.merge(thread.results)
-		
-		struct = buildingSet.getScoreStruct("BEST_TEAM_STATE")
-		struct.print()
-		print("Time: %s" %(time() - start))
 		print("WARNING!!!! You're writing to and from a dictionary with key control. Will break Retrofit relationships")
-		return buildingSet
+		self.results	= buildingSet
 	##
 	# Parse command line arguments: Extends RetrofitNSGA2.ParseCMD()
 	##
@@ -119,6 +118,8 @@ class NSGA2Community():
 		parser.add_argument("--target-rating", type=str, help="Minimum EPC rating that defines the GA constraint")
 		parser.add_argument("--threads", type=int, help="Number of concurrent RetrofitNSGA2 threads")
 		parser.add_argument("--partitions", type=int, help="Number of BuilingSet subsets processed by the threads")
+		parser.add_argument("--recurrent-steps", type=int, help="How many recurrent stages. How many times to run the output through NSGA2Community")
+		parser.add_argument("--inequality", type=int, help="Explicity set minimum EPC point improvement. Default to --target [A-F]")
 		
 		# Parse
 		args 		= parser.parse_args()
@@ -135,10 +136,12 @@ class NSGA2Community():
 		targetRating		= args.target_rating if args.target_rating else "D"
 		threads				= args.threads if args.threads else 2
 		partitions			= args.partitions if args.partitions else 2
+		recurrentSteps		= args.recurrent_steps if args.recurrent_steps else 1
 		verbose				= args.verbose
 		writeState			= args.write_state
 		silent				= args.silent
 		bestInitalStates	= args.best_initial_states
+		inequality			= args.inequality if args.inequality else False
 
 		# Print config
 		return {
@@ -157,6 +160,14 @@ class NSGA2Community():
 			"silent":				silent,
 			"targetRating":			targetRating,
 			"threads":				threads,
-			"partitions":			partitions
+			"partitions":			partitions,
+			"recurrentSteps":		recurrentSteps,
+			"inequality":			inequality
 		}
+	@staticmethod
+	def ParamsToFlagString(flags):
+		flagString = RetrofitNSGA2.ParamsToFlagString(flags)
+		if "stateIdentifier" in flags:
+			flagString += " --state-identifier %s" %(flags["stateIdentifier"])
+		return flagString
 
