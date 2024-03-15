@@ -9,7 +9,7 @@ from lib.building_set		import BuildingSet
 #  Command line parameters  #
 #############################
 # Parse
-params			= RetrofitNSGA2.ParseCMD()
+params			= NSGA2Community.ParseCMD()
 # Verify
 dataPath		= "./data/" + params["dataCode"] + ".csv"
 if not isfile(dataPath):
@@ -21,5 +21,8 @@ if not isfile(dataPath):
 # Load data
 buildings	= BuildingSet.LoadDataSet(dataPath).getByRatings(["G", "F", "E"])
 del params["dataCode"]
-community	= NSGA2Community(buildings, "shoe", partitions=4, threadCount=4, flags=RetrofitNSGA2.ParamsToFlagString(params))
+community	= NSGA2Community(buildings, "shoe", 
+				partitions=params["partitions"], 
+				threadCount=params["threads"], 
+				flags=RetrofitNSGA2.ParamsToFlagString(params))
 community.run()
