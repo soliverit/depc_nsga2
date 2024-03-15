@@ -40,6 +40,7 @@ def optimise(crossoverETA, crossoverProb, mutationETA):
 	retrofitGA.run()
 	# Return the results. The bayes library maximises, so return a negative
 	results						= retrofitGA.getResult()
+	retrofitGA.printResults()
 	return - int(round(results["cost"] / results["points"]))
 
 ### Let's do it! ###

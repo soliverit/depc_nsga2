@@ -2,7 +2,8 @@
 ## Native
 import csv
 ## Project
-from lib.building	import Building
+from lib.building		import Building
+from lib.score_struct	import ScoreStruct
 class BuildingSet():
 	### Static stuff ###
 	## Methods 
@@ -131,7 +132,17 @@ class BuildingSet():
 			"cost": cost, 
 			"points": points
 		}
+	##
+	# Create an array of the indices of the Cheapest Retrofit that brings Building not
+	# at the target rating. Remaining Building get 0 index, the do-nothing or as-built Retrofit
+	#
+	# params:
+	#	rating:	char target EPC rating.
+	#
+	# output:	array of Retrofit indices denoting cheapest to rating states.
+	##
 	def getCheapestToRatingState(self, rating):
+		rating	= rating.upper()
 		state	= []
 		for building in self.buildings:
 			# Get score, skip buildings that are at least the target rating
@@ -145,6 +156,14 @@ class BuildingSet():
 			else:
 				state.append(stateID)
 		return state
+	##
+	# Take an array denoting a BuildingState like that created by self.getCheapestToRatingState(rating)
+	#
+	# params:
+	#	state:	array of BuildingSet, Building Retrofit array indices.
+	#
+	# output:	dictionary {"cost": float, "points": float} cost of all Retrofit and Difference in EPC points.
+	##
 	def scoreState(self, state):
 		cost	= 0
 		points	= 0
@@ -169,6 +188,22 @@ class BuildingSet():
 			if difference > 0:
 				total += difference
 		return total
+	##
+	# Create the ScoreStruct from the results based on a key in self.data
+	#
+	# params:
+	#	key:	string column name for self.data. Must be added by another process such as in nsga2.py writeStateFile
+	#
+	# output:	ScoreStruct representing best state identified by NSGA2
+	##
+	def getScoreStruct(self, key):
+		scoreStruct	= ScoreStruct()
+		for building in self.buildings:
+			retrofit				= building.getRetrofit(int(building.data[key]))
+			scoreStruct.cost		+= retrofit.cost
+			scoreStruct.points		+= retrofit.efficiency
+			scoreStruct.difference	+= retrofit.difference
+		return scoreStruct
 	##
 	# Merge set (Shallow clone for read-only stuff (or whatever, am no your mum.))
 	##
@@ -202,24 +237,23 @@ class BuildingSet():
 	@property
 	def length(self):
 		return len(self.buildings)
-	
-	### Maigc... Methods ###
+	### Maigc Methods ###
+	##
+	# Iterator methods: __iter__, __next__. Credit to the internet. Never wrote an iterator before
+	##
 	def __iter__(self):
 		# This method returns an iterator object
 		self._iter_index = 0
 		return self
-
 	def __next__(self):
-		# This method defines how to retrieve the next element in the iteration
 		if self._iter_index < len(self.buildings):
 			result = self.buildings[self._iter_index]
 			self._iter_index += 1
 			return result
 		else:
-			# Let the caller know the iteration is over
 			raise StopIteration
 	##
-	# Get building
+	# Get building by index
 	##
 	def __getitem__(self, buildingID):
 		return self.buildings[buildingID]

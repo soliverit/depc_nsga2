@@ -7,13 +7,17 @@ from lib.problem import Problem
 # Cost problem: A problem with cost inequality
 ##
 class CostProblem(Problem):
-	def __init__(self, buildings, objectiveFraction=0.95):
+	##
+	# params:
+	#	buildings:	BuildingSet
+	##
+	def __init__(self, buildings):
 		## Parameters
 		self.nObjectives	= 2
 		## Super constructor!
-		super().__init__(buildings, objectiveFraction)
+		super().__init__(buildings)
 	##
-	# The two-objective score function
+	# The two-objective score function (Overridden Abstract)
 	#
 	# Objectives:
 	#	1: Minimise the cost to EPC point difference ratio
@@ -25,9 +29,9 @@ class CostProblem(Problem):
 	def _evaluate(self, x, out, *args, **kwargs):
 		cost 		= 0
 		difference	= 0
-		i			= 0
+		i			= 0	# micro optimisation for process speed. Really micro but _evaluate's called anywhere up to millions of times
 		for building in self.buildings:
-			retrofitID	= int(x[i])
+			retrofitID	= int(x[i])	# Fun fact:IntegerRandomSampling is the floored X value and int floors.
 			retrofit 	= building.getRetrofit(retrofitID)
 			cost 		+= retrofit.cost
 			difference	+= retrofit.difference

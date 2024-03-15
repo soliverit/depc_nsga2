@@ -119,6 +119,14 @@ class Building():
 				result	= retrofit
 				cost	= retrofit.cost
 		return result
+	##
+	# Get the self.retrofits ID of the cheapest Retrofit to get to the minimum EPC points (efficiency)
+	#
+	# params:
+	#	efficiency:	float/int of minimum EPC efficiency to be achieved
+	#
+	# output:	int self.retrofits array index
+	##
 	def getCheapestRetrofitToEfficiencyID(self, efficiency):
 		retrofitID	= 0
 		cost 	= 9999999999999
