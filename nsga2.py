@@ -35,14 +35,14 @@ if not isfile(dataPath):
 # Load data
 buildings			= BuildingSet.LoadDataSet(dataPath).getByRatings(["G", "F", "E"])
 # Select the at risk buildings
-buildingStats		= buildings.getCheapestToRating("D")
+buildingStats		= buildings.getCheapestToRating(params["targetRating"])
 
 # Prepare problem
-inequality			= buildings.toRatingDifference("D")
+inequality			= buildings.toRatingDifference(params["targetRating"])
 buildings.filterRetrofitsByImpactRatio(600)
 buildings.filterZeroOptionBuildings()
-problem				= CostProblem(buildings)
-problem.inequality	= inequality
+problem				= CostProblem(buildings, inequality)
+
 
 ##
 # Prepare solution space
