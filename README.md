@@ -3,7 +3,7 @@ An NSGA-II estate retrofit strategy generator and Bayesian optimisation model fo
 
 ## Features
  - **NSGA2**: A nondominated sorting genetic algorithm for residential EPCs.
- - **NSGA2Community**: A stratified NSGA2 optimiser for fast optimisation
+ - **NSGA2Community**: A fast, threaded subset optimisation algorithm. 
 ## Summary
 Takes a csv of retrofits for multiple buildings and finds near-optimal strageies for improving the overall target score. 
 
