@@ -205,6 +205,7 @@ class RetrofitNSGA2():
 		parser.add_argument("--best-initial-states", help="Use cheapest building-locked as the intial states", action="store_true")
 		parser.add_argument("--write-state", help="Append results to the BuildingSet and write new file", action="store_true")
 		parser.add_argument("--history-path", type=str, help="Where to write the CSV results?")
+		parser.add_argument("--target-rating", type=str, help="Minimum EPC rating that defines the GA constraint")
 		# Parse
 		args 		= parser.parse_args()
 		# Set values
@@ -217,10 +218,12 @@ class RetrofitNSGA2():
 		population			= args.population if args.population else 40
 		children			= args.children if args.children else 20
 		historyPath			= args.history_path if args.history_path else False
+		targetRating		= args.target_rating if args.target_rating else "D"
 		verbose				= args.verbose
 		writeState			= args.write_state
 		silent				= args.silent
 		bestInitalStates	= args.best_initial_states
+
 		# Print config
 		if args.summary:
 			print(PrintHelper.padArray(["Data code", dataCode], 16))
@@ -247,7 +250,8 @@ class RetrofitNSGA2():
 			"verbose":				verbose,
 			"bestInitialStates":	bestInitalStates,
 			"writeState":			writeState,
-			"silent":				silent
+			"silent":				silent,
+			"targetRating":			targetRating
 		}
 	@staticmethod
 	def ParamsToFlagString(params):
@@ -274,4 +278,6 @@ class RetrofitNSGA2():
 			flagString	+= " --write-state"
 		if "silent" in params:
 			flagString	+= " --silent"
+		if "targetRating" in params:
+			flagString	+= " --target-rating %s" %(params["targetRating"])
 		return flagString
