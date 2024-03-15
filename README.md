@@ -1,12 +1,19 @@
-# DEPC-NSGA-II (Python)
+DEPC-NSGA-II: Standard and stratified parallel optimisation 
 An NSGA-II estate retrofit strategy generator and Bayesian optimisation model for tuning NSGA-II hyperparameters.
 
+## Features
+ - **NSGA2**: A nondominated sorting genetic algorithm for residential EPCs.
+ - **NSGA2Community**: A stratified NSGA2 optimiser for fast optimisation
 ## Summary
-Takes a csv of retrofits for multiple buildings and finds near-optimal strageies for improving the overall target score. For example, "./example.py" finds the cost to points improved that brings all buildings in the dataset to the target EPC rating, D.
+Takes a csv of retrofits for multiple buildings and finds near-optimal strageies for improving the overall target score. 
+
 ### Features
-`example.py` A configurable example of the optimisation process.
+`nsga2.py` The script that processes datasets as a whole
+
+`nsga2_community.py` The script that processes datasets in subsets
 
 `bayes_optimiser.py` A Bayesian optimisiation process for tuning NSGA-II hyperparameters.
+
 ## Getting started
 ### Prerequisites
 - PyMOO `pip install pymoo`
@@ -16,7 +23,7 @@ The example is straightforward. Just run `python example.py`
 - Add `--summary` to see the NSGA-II and Problem configuration.
 - Add `-h` to list command line parameters
 #### Output
-Output from running `python example.py  --code 11k --gen 10000 --population 100 --children 60 --history-path ./test/water.csv --crossover --crossover-eta 16.1 --crossover-prob 0.8460 --mutation-eta 5.22 --summary`
+Output from running `python nsga2.py  --code 11k --gen 10000 --population 100 --children 60 --history-path ./test/gen_results.csv --crossover --crossover-eta 16.1 --crossover-prob 0.8460 --mutation-eta 5.22 --summary`
 
 <img src="https://github.com/soliverit/depc_nsga2/assets/3307541/d0273235-bc44-4fd7-ad47-eb77cb3def6d)" alt="drawing" height="250"/>
    
@@ -24,8 +31,8 @@ Output from running `python example.py  --code 11k --gen 10000 --population 100 
 
 
 
-### Command line parameters
-`--code` Input file code: The name of a file in `./data/`. E.g, `mid` points to `./data/mid.csv`
+### Command line parameters (./nsga2.py)
+`--code` Input file code: The name of a file in `./data/`. E.g, `mid` points to `./data/mid.csv` or `my_project/initial` to `./data/my_project/initial`
 
 `--summary` Print a summary of the NSGA-II and Problem configs
 
@@ -46,6 +53,16 @@ Output from running `python example.py  --code 11k --gen 10000 --population 100 
 `--children` Number of children parents have each generation
 
 `--history-path` Path to objective score history.
+
+`--best-initial-states` Create the initial population from the building-locked best case for at risk buildings (Worse than D rating, currently)
+
+`--target-rating` The target EPC rating that dictates the EPC point improvement requirements. The genetic algorithm constraint and second objective
+
+`--write-state` Write a .stt (just a csv with a distinct file type) to the input data directory
+### Additional parameters for ./nsga2community.py
+`--partitions` Number of subsets data is split into.
+
+`--threads` Number of concurrent processses
 
 ### Data format
 In the example using results created by https://github.com/soliverit/depc_emulator using the Building and Retrofit base classes, each row has three key component:
