@@ -11,11 +11,11 @@ class CostProblem(Problem):
 	# params:
 	#	buildings:	BuildingSet
 	##
-	def __init__(self, buildings):
+	def __init__(self, buildings, inequality=0):
 		## Parameters
 		self.nObjectives	= 2
 		## Super constructor!
-		super().__init__(buildings)
+		super().__init__(buildings, inequality=inequality)
 	##
 	# The two-objective score function (Overridden Abstract)
 	#
