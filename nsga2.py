@@ -80,9 +80,11 @@ retrofitGA	= RetrofitNSGA2(problem,
 	callback=Historian() if params["historyPath"] else False,
 	verbose=params["verbose"]
 )
-retrofitGA.printBenchmark()
+if not params["silent"]:
+	retrofitGA.printBenchmark()
 retrofitGA.run()
-retrofitGA.printResults()
+if not params["silent"]:
+	retrofitGA.printResults()
 if params["historyPath"]:
 	retrofitGA.writeCSVRow(params["historyPath"])
 if params["writeState"]:

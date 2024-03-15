@@ -194,6 +194,7 @@ class RetrofitNSGA2():
 		parser.add_argument("--code", type=str, help="Set the sample_data file code. E.g '11k' = './sample_data/11k.csv'")
 		parser.add_argument("--summary", help="Print these parameters", action="store_true")
 		parser.add_argument("--verbose", help="Enable NSGA2 console logging", action="store_true")
+		parser.add_argument("--silent", help="Don't write results to console", action="store_true")
 		parser.add_argument("--crossover",  help="I tell it to use crossover", action="store_true")
 		parser.add_argument("--crossover-eta", type=float, help="Set crossover eta")
 		parser.add_argument("--crossover-prob", type=float, help="Set crossover prob")
@@ -218,6 +219,7 @@ class RetrofitNSGA2():
 		historyPath			= args.history_path if args.history_path else False
 		verbose				= args.verbose
 		writeState			= args.write_state
+		silent				= args.silent
 		bestInitalStates	= args.best_initial_states
 		# Print config
 		if args.summary:
@@ -244,7 +246,8 @@ class RetrofitNSGA2():
 			"children":				children,
 			"verbose":				verbose,
 			"bestInitialStates":	bestInitalStates,
-			"writeState":			writeState
+			"writeState":			writeState,
+			"silent":				silent
 		}
 	@staticmethod
 	def ParamsToFlagString(params):
@@ -269,4 +272,6 @@ class RetrofitNSGA2():
 			flagString += " --best-initial-states"
 		if "writeState" in params:
 			flagString	+= " --write-state"
+		if "silent" in params:
+			flagString	+= " --silent"
 		return flagString
