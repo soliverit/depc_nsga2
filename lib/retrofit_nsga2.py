@@ -1,6 +1,6 @@
 ### Includes ### 
 ## Native
-import argparse
+from argparse						import ArgumentParser
 from time							import time
 from csv							import DictWriter
 from pymoo.algorithms.moo.nsga2 	import NSGA2
@@ -190,7 +190,7 @@ class RetrofitNSGA2():
 
 	@staticmethod
 	def ParseCMD():
-		parser = argparse.ArgumentParser(description="Domestic EPC retrofit strategy maker")
+		parser = ArgumentParser(description="Domestic EPC retrofit strategy maker")
 		parser.add_argument("--code", type=str, help="Set the sample_data file code. E.g '11k' = './sample_data/11k.csv'")
 		parser.add_argument("--summary", help="Print these parameters", action="store_true")
 		parser.add_argument("--verbose", help="Enable NSGA2 console logging", action="store_true")
@@ -206,6 +206,8 @@ class RetrofitNSGA2():
 		parser.add_argument("--write-state", help="Append results to the BuildingSet and write new file", action="store_true")
 		parser.add_argument("--history-path", type=str, help="Where to write the CSV results?")
 		parser.add_argument("--target-rating", type=str, help="Minimum EPC rating that defines the GA constraint")
+		parser.add_argument("--state-identifier", type=str, help="A CSV column name that indicates a Retrofit ID used for creating the initial population. In conjunction with --best-initial-states")
+		parser.add_argument("--inequality", type=int, help="Explicity set minimum EPC point improvement. Default to --target [A-F]")
 		# Parse
 		args 		= parser.parse_args()
 		# Set values
@@ -223,7 +225,8 @@ class RetrofitNSGA2():
 		writeState			= args.write_state
 		silent				= args.silent
 		bestInitalStates	= args.best_initial_states
-
+		stateIdentifier		= args.state_identifier if args.state_identifier else False
+		inequality			= args.inequality if args.inequality else False
 		# Print config
 		if args.summary:
 			print(PrintHelper.padArray(["Data code", dataCode], 16))
@@ -251,7 +254,9 @@ class RetrofitNSGA2():
 			"bestInitialStates":	bestInitalStates,
 			"writeState":			writeState,
 			"silent":				silent,
-			"targetRating":			targetRating
+			"targetRating":			targetRating,
+			"stateIdentifier":		stateIdentifier,
+			"inequality":			inequality
 		}
 	@staticmethod
 	def ParamsToFlagString(params):
@@ -272,11 +277,11 @@ class RetrofitNSGA2():
 			flagString += " --crossover-prob %s" %(params["crossoverProb"])
 		if "mutationETA" in params:
 			flagString += " --mutation-eta %s" %(params["mutationETA"])
-		if "bestInitialStates" in params:
+		if "bestInitialStates" in params and params["bestInitialStates"]:
 			flagString += " --best-initial-states"
 		if "writeState" in params:
 			flagString	+= " --write-state"
-		if "silent" in params:
+		if "silent" in params and params["silent"]:
 			flagString	+= " --silent"
 		if "targetRating" in params:
 			flagString	+= " --target-rating %s" %(params["targetRating"])
