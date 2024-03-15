@@ -33,21 +33,15 @@ if not isfile(dataPath):
 #    The actual example     #
 #############################
 # Load data
-buildings			= BuildingSet.LoadDataSet(dataPath).getByRatings(["G", "F", "E"])
+buildings		= BuildingSet.LoadDataSet(dataPath).getByRatings(["G", "F", "E"])
 # Select the at risk buildings
-buildingStats		= buildings.getCheapestToRating(params["targetRating"])
+buildingStats	= buildings.getCheapestToRating(params["targetRating"])
 
 # Prepare problem
-inequality			= buildings.toRatingDifference(params["targetRating"])
+inequality		= params["inequality"] if params["inequality"] else  buildings.toRatingDifference(params["targetRating"])
 buildings.filterRetrofitsByImpactRatio(buildingStats["cost"] / buildingStats["points"] * 2)
 buildings.filterZeroOptionBuildings()
-problem				= CostProblem(buildings, inequality)
-
-
-##
-# Prepare solution space
-##
-# Anything above double the base object isn't a good fit
+problem		= CostProblem(buildings, inequality)
 
 ##
 # Build the algorithm
@@ -61,11 +55,18 @@ initialStates		= []
 from random import random
 if params["bestInitialStates"]:
 	for i in range(params["population"]):
-		for v in bestInitialState:
-			if random() >  0.3:
-				initialStates.append(v)
-			else:
-				initialStates.append(0)
+		if  params["stateIdentifier"]:
+			for building in buildings:
+				if random() >  0.0:
+					initialStates.append(int(building.data[params["stateIdentifier"]]))
+				else:
+					initialStates.append(0)
+		else:
+			for v in bestInitialState:
+				if random() >  0.3:
+					initialStates.append(v)
+				else:
+					initialStates.append(0)
 	initialStates	= np.array(initialStates)
 # Build it.
 retrofitGA	= RetrofitNSGA2(problem,
