@@ -39,7 +39,7 @@ buildingStats		= buildings.getCheapestToRating(params["targetRating"])
 
 # Prepare problem
 inequality			= buildings.toRatingDifference(params["targetRating"])
-buildings.filterRetrofitsByImpactRatio(600)
+buildings.filterRetrofitsByImpactRatio(buildingStats["cost"] / buildingStats["points"] * 2)
 buildings.filterZeroOptionBuildings()
 problem				= CostProblem(buildings, inequality)
 
@@ -86,6 +86,6 @@ retrofitGA.run()
 if not params["silent"]:
 	retrofitGA.printResults()
 if params["historyPath"]:
-	retrofitGA.writeCSVRow(params["historyPath"])
+	retrofitGA.writeHistory(params["historyPath"])
 if params["writeState"]:
 	retrofitGA.writeState(statePath)
