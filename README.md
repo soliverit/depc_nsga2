@@ -61,6 +61,8 @@ Output from running `python nsga2.py  --code 11k --gen 10000 --population 100 --
 `--write-state` Write a .stt (just a csv with a distinct file type) to the input data directory
 
 `--inequality` Explicitly define the minimum points improved constraint
+
+`--state-identifier` Tell the script that the data has a column with a Retrofit ID chosen during a previous optimisation. Use the value as in place of `--best-initial-states` building-locked states
 ### Additional parameters for ./nsga2_community.py
 `--partitions` Number of subsets data is split into.
 
