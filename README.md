@@ -68,6 +68,8 @@ Output from running `python nsga2.py  --code 11k --gen 10000 --population 100 --
 
 `--threads` Number of concurrent processses
 
+`--recurrent-step` The number of times results are fed back into the processor.
+
 ### Data format
 In the example using results created by https://github.com/soliverit/depc_emulator using the Building and Retrofit base classes, each row has three key component:
 
