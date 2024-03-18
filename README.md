@@ -59,7 +59,9 @@ Output from running `python nsga2.py  --code 11k --gen 10000 --population 100 --
 `--target-rating` The target EPC rating that dictates the EPC point improvement requirements. The genetic algorithm constraint and second objective
 
 `--write-state` Write a .stt (just a csv with a distinct file type) to the input data directory
-### Additional parameters for ./nsga2community.py
+
+`--inequality` Explicitly define the minimum points improved constraint
+### Additional parameters for ./nsga2_community.py
 `--partitions` Number of subsets data is split into.
 
 `--threads` Number of concurrent processses
