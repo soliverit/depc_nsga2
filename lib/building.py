@@ -59,6 +59,15 @@ class Building():
 				)
 				self.addRetrofit(retrofit)
 		self.retrofits	= sorted(self.retrofits, key=lambda x: x.impactRatio)
+	##
+	# Determine the number of EPC index points the building's rating needs to be increased
+	# by to bring it's rating to the target rating
+	#
+	# Params:
+	#	rating:	char rating [A through F] target EPC rating
+	#
+	# Output:	int difference between target and existing. If result < 0, returns 0
+	##
 	def toRating(self, rating):
 		target	= Building.RATING_BRACKETS[rating]["lower"]
 		if self.efficiency < target:
@@ -66,16 +75,25 @@ class Building():
 		return 0
 	##
 	# Get Retrofit by index
+	#
+	# Params:
+	#	id:	int Retrofit array index
 	##
 	def getRetrofit(self, id):
 		return self.retrofits[id]
 	##
 	# Add Retrofit: TODO: Check uniqueness
+	#
+	# Params:
+	#	retrofit:	Retrofit that should be for this Building
 	##
 	def addRetrofit(self, retrofit):
 		self.retrofits.append(retrofit)
 	##
 	# Remov Retrofits with a cost and ratio greater than the inputs
+	#
+	# Params:
+	#	threshold:	float cost / point difference max value. Delete Retrofit if higher
 	#
 	def filterRetrofitsByImpactRatio(self, threshold):
 		retrofits	= []
@@ -83,6 +101,9 @@ class Building():
 			if retrofit.impactRatio < threshold:
 				retrofits.append(retrofit)
 		self.retrofits	= retrofits
+	##
+	# Filter Retrofits with a cost and cost / point difference ratio greater than input parameters
+	#
 	# Params:
 	#	cost:	float highest acceptable cost
 	#	ratio:	float highest acceptable ratio
