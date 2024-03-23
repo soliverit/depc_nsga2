@@ -17,8 +17,6 @@ class CostProblem(Problem):
 		self.nObjectives	= 2
 		## Super constructor!
 		super().__init__(buildings, inequality=inequality)
-		self.shoe = 0
-		self.timer = False
 	##
 	# The two-objective score function (Overridden Abstract)
 	#
@@ -30,16 +28,15 @@ class CostProblem(Problem):
 	#	1: The number of points reduced much be at least self.inequality
 	##
 	def _evaluate(self, x, out, *args, **kwargs):
+		# Calculate score values
 		cost 		= 0
 		difference	= 0
-		i			= 0	# micro optimisation for process speed. Really micro but _evaluate's a lot
-		for building in self.buildings:
-			retrofitID	= int(x[i])	# Fun fact:IntegerRandomSampling is the floored X value and int floors.
-			retrofit 	= building.getRetrofit(retrofitID)
+		for i in range(len(self.buildings)):
+			retrofit 	= self.buildings[i].getRetrofit(int(x[i]))
 			cost 		+= retrofit.cost
 			difference	+= retrofit.difference
-			i			+= 1
 		# The thing we're trying to minimise
 		out["F"]	= [cost / difference, difference]
 		# The constraint: Anything >= self.inequality is accepted
 		out["G"]	= 0 if self.inequality < difference else self.inequality - difference
+		
