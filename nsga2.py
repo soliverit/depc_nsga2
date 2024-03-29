@@ -78,7 +78,10 @@ retrofitGA	= RetrofitNSGA2(problem,
 	verbose=params["verbose"]
 )
 if not params["silent"]:
-	retrofitGA.printBenchmark()
+	print("Cost:          %s" %(round(buildingStats["cost"])))
+	print("Target points: %s" %(buildingStats["points"]))
+	print("Met points:    %s" %(buildingStats["metPoints"]))
+	print("Target ratio:  %s" %(round(buildingStats["cost"] / buildingStats["metPoints"], 2)))
 retrofitGA.run()
 if not params["silent"]:
 	retrofitGA.printResults()
