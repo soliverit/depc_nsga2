@@ -22,8 +22,9 @@ class NSGA2ProcessThread(Thread):
 		self.results	= False				# BuildingSet from .stt file. Same as BuildingSet NSGA2 selection in building.data
 		## TODO: Refactor "./data/" out of this from the dataPath statement in
 		# ./example.py (soon to be nsga2.py)
-		self.filePath	= "./data/" +  directory  + code + ".csv" # string csv input file path
-		self.sttPath	= "./data/" +  directory  + code + ".stt" # string stt output path (just a csv with a convenient extension change)
+		self.directory	= "./data/" +  directory 
+		self.filePath	= self.directory + code + ".csv" # string csv input file path
+		self.sttPath	= self.directory +  directory  + code + ".stt" # string stt output path (just a csv with a convenient extension change)
 	##
 	# Run the thread process
 	#
@@ -34,9 +35,6 @@ class NSGA2ProcessThread(Thread):
 	# 5) Flag the process as complete
 	##
 	def run(self):
-		# Mkae dir if it doesn't exist
-		if not isdir(self.directory):
-			mkdir(self.directory)
 		# Write the file for nsga2.py
 		self.buildings.writeFile(self.filePath)
 		# Run nsga2.py

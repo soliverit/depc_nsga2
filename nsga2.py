@@ -1,16 +1,12 @@
 ### Includes ###
 ## Native 
-import argparse
-import numpy as np
+
+from random 						import random
 from os.path						import isfile
-from os.path 						import isfile
 ## Project
-from lib.building					import Building
-from lib.problem					import Problem
 from lib.cost_problem				import CostProblem
 from lib.building_set				import BuildingSet
 from lib.retrofit_nsga2				import RetrofitNSGA2
-from lib.print_helper				import PrintHelper
 from lib.historian					import Historian
 
 #############################
@@ -36,11 +32,11 @@ if not isfile(dataPath):
 buildings		= BuildingSet.LoadDataSet(dataPath).getByRatings(["G", "F", "E"])
 # Select the at risk buildings
 buildingStats	= buildings.getCheapestToRating(params["targetRating"])
-
 # Prepare problem
 inequality		= params["inequality"] if params["inequality"] else  buildings.toRatingDifference(params["targetRating"])
 buildings.filterRetrofitsByImpactRatio(buildingStats["cost"] / buildingStats["points"] * 2)
 buildings.filterZeroOptionBuildings()
+buildings.filterHarderMeasures()
 problem		= CostProblem(buildings, inequality)
 
 ##
@@ -52,12 +48,12 @@ problem		= CostProblem(buildings, inequality)
 # Create initial states
 bestInitialState	= buildings.getCheapestToRatingState("D")
 initialStates		= []
-from random import random
+
 if params["bestInitialStates"]:
 	for i in range(params["population"]):
 		if  params["stateIdentifier"]:
 			for building in buildings:
-				if random() >  0.0:
+				if random() >  0.005:
 					initialStates.append(int(building.data[params["stateIdentifier"]]))
 				else:
 					initialStates.append(0)
