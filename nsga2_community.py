@@ -1,6 +1,7 @@
 ### Includes ###
 ## Native 
-from os.path				import isfile
+from os.path				import isfile, isdir
+from os						import mkdir
 from time					import time
 ## Project
 from lib.nsga2_community	import NSGA2Community
@@ -10,7 +11,9 @@ from lib.building_set		import BuildingSet
 #############################
 # Parse
 params			= NSGA2Community.ParseCMD()
-
+# Check for processing directory: Unlike nsga2.py, this explicitly uses ./processing for data
+if not isdir("./processing/"):
+	mkdir("./processing/")
 # Verify
 dataPath		= "./data/" + params["dataCode"] + ".csv"
 if not isfile(dataPath):
