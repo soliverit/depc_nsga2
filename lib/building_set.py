@@ -1,6 +1,7 @@
 ### Imports ###
 ## Native
-import csv
+from csv				import DictReader, DictWriter
+from random				import shuffle
 ## Project
 from lib.building		import Building
 from lib.score_struct	import ScoreStruct
@@ -11,7 +12,7 @@ class BuildingSet():
 	def LoadDataSet(path):
 		buildings	= __class__()
 		with open(path, 'r') as file:
-			csvReader = csv.DictReader(file)
+			csvReader = DictReader(file)
 			# Iterate over each row in the CSV file
 			for row in csvReader:
 				# 'row' is a list containing the values of each column in the current row
@@ -28,7 +29,7 @@ class BuildingSet():
 	def writeFile(self, path):
 		with open(path, "w") as csvfile:
 			columnNames	= list(self.buildings[0].data)
-			writer = csv.DictWriter(csvfile, fieldnames=columnNames)
+			writer = DictWriter(csvfile, fieldnames=columnNames)
 			writer.writeheader()
 			for building in self.buildings:
 				writer.writerow(building.data)
@@ -43,6 +44,11 @@ class BuildingSet():
 	def append(self, building):
 		self.buildings.append(building)
 		self.area += building.area
+	##
+	# Shuffle the order of the Buildings
+	##
+	def shuffle(self):
+		shuffle(self.buildings)
 	##
 	# Create a new set of Buildings with the target rating (A - G)
 	#
@@ -210,8 +216,24 @@ class BuildingSet():
 	def merge(self, otherSet):
 		for building in otherSet:
 			self.append(building)
-			
+	##
+	# Clone (Shallow clone (or whatever, still no your mum))
+	#
+	# output:	BuildingSet of the same Buildings in this set
+	##
+	def clone(self):
+		newSet	= __class__()
+		for building in self.buildings:
+			newSet.append(building)
+		return newSet
 	### Filters ###
+	##
+	# Filter Retrofits with more measures, less impact than others
+	##
+	def filterHarderMeasures(self):
+		for building in self.buildings:
+			building.filterHarderMeasures()
+
 	##
 	# Filter Retrofits by impact ratio
 	##
@@ -238,6 +260,8 @@ class BuildingSet():
 	def length(self):
 		return len(self.buildings)
 	### Maigc Methods ###
+	def __len__(self):
+		return len(self.buildings)
 	##
 	# Iterator methods: __iter__, __next__. Credit to the internet. Never wrote an iterator before
 	##
