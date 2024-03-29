@@ -12,6 +12,7 @@ from pymoo.termination 				import get_termination
 from math							import floor
 ## Project
 from lib.print_helper				import PrintHelper
+from lib.result_struct_set			import ResultStructSet
 ##
 # Retrofit NSGA-II
 ##
@@ -41,6 +42,8 @@ class RetrofitNSGA2():
 		self.mutationModel	= PM
 		## Sampler parameters
 		self.sampler		= IntegerRandomSampling()
+		## ResultStructSet holder. I hate _* vars, but it works best for this
+		self._results		= False
 	##
 	# Create a crossover model
 	#
@@ -61,7 +64,7 @@ class RetrofitNSGA2():
 	# Define the pymoo.NSGA2 model. If self.crossover = True, include crossover
 	##
 	def createAlgorithm(self):
-		# TODO: Replace if with **args
+		# TODO: Replace conditional with **args
 		if self.crossover:
 			self.algorithm	= NSGA2(
 				pop_size=self.population,
@@ -101,23 +104,27 @@ class RetrofitNSGA2():
 		)
 		self.time	= time() - start
 	##
-	# Get the results from the last process
+	# Get the ResultStructSet fro the last run(). Build it if necessary
 	#
-	# Output: Hash{
-	#		cost:	float total cost of selected Retrofits
-	#		points:	int total number of EPC points improved
-	#	}
+	# output:	ResultStructSet
 	##
-	def getResult(self):
-		cost 	= 0.0
-		points	= 0.0
-		x		= self.lastResult.X
-		for idx in range(len(x[-1])):
-			building	= self.problem.buildings.buildings[idx]
-			retrofit 	= building.getRetrofit(floor(x[-1][idx]))
-			cost 		+= retrofit.cost
-			points		+= retrofit.difference
-		return {"cost": cost, "points": points}
+	@property
+	def results(self):
+		if self._results:
+			self._results 
+		self._results	= ResultStructSet(self.problem.buildings.clone())
+		for i in range(len(self.lastResult.X)):
+			cost 	= 0.0
+			points	= 0.0
+			for idx in range(len(self.lastResult.X[i])):
+				building	= self.problem.buildings.buildings[idx]
+				retrofit 	= building.getRetrofit(floor(self.lastResult.X[i][idx]))
+				cost 		+= retrofit.cost
+				points		+= retrofit.difference
+			self._results.add(cost, points, self.lastResult.X[i],self.lastResult.F[i])
+		return self._results
+	def getResult(self, idx):
+		self.results[idx]
 	##
 	# Print Problem summary and Benchmark
 	#
@@ -135,7 +142,7 @@ class RetrofitNSGA2():
 		print("Cost:           %s" %(round(results["cost"])))
 		print("Effective cost: %s" %(round(results["cost"] * (results["points"] / results["metPoints"]))))
 		print("Points:         %s" %(results["points"]))
-		print("Ratio:          %s" %(round(results["cost"] / results["metPoints"], 1)))
+		print("Ratio:          %s" %(round(results["cost"] / self.problem.inequality, 1)))
 	##
 	# I'm not even documenting this one. Does what it says on the tin
 	##
@@ -145,9 +152,9 @@ class RetrofitNSGA2():
 		
 		print("--- Optimised ---")
 		print("Time:   %s" %(self.time))
-		result	= self.getResult()
-		cost	= result["cost"]
-		points	= result["points"]
+		result	= self.results.findBest()
+		cost	= result.cost
+		points	= result.points
 		print("Cost:   %s" %(round(cost)))
 		print("Points: %s" %(round(points)))
 		print("Ratio:  %s" %(round(cost / points, 2)))
@@ -285,4 +292,6 @@ class RetrofitNSGA2():
 			flagString	+= " --silent"
 		if "targetRating" in params:
 			flagString	+= " --target-rating %s" %(params["targetRating"])
+		if "inequality" in params:
+			flagString	+= " --inequality %s" %(params["inequality"])
 		return flagString
