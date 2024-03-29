@@ -8,6 +8,19 @@ class RetrofitOption():
 		self.measureCount	= measureCount			# Number of measures in the Retrofit
 		self.costKey		= description + "-Cost"	# CSV file cost column name
 		self.efficiencyKey	= description + "-Eff"	# CSV file EPC efficiency column name
+		self.measures		= self.description.split("_")
+	@property
+	def hasRoof(self):
+		return "roof" in self.measures
+	@property
+	def hasEnvelopes(self):
+		return "envelopes" in self.measures
+	@property
+	def hasWindows(self):
+		return "windows" in self.measures
+	@property
+	def hasHotwater(self):
+		return "hotwater" in self.measures
 ##
 # Since we know the entire set, it's easier just to define them all in static variables.
 ##
