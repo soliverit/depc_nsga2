@@ -1,8 +1,6 @@
 ### Include ###
 ## Native
 from argparse					import ArgumentParser
-from os.path					import isfile, isdir
-from os							import mkdir
 from time						import time, sleep
 ## Project
 from lib.nsga2_process_thread	import NSGA2ProcessThread
@@ -20,15 +18,18 @@ class NSGA2Community():
 	#	threadCount:	integer number of concurrent threads
 	#	flags:			string command line arguments for nsga2.py
 	## 
-	def __init__(self, buildings, dataDirectory, partitions=8, threadCount=4, inequality=False,flags=""):
+	def __init__(self, buildings, dataDirectory, partitions=8, threadCount=4, inequality=False,flags={},stateLabel=""):
 		self.buildings			= buildings				# BuildingSet
 		self.dataDirectory		= dataDirectory + "/"	# Directory where files are saved
 		self.partitions			= partitions			# Number of BuildingSets
 		self.threadCount		= threadCount			# Number of concurrent threads
 		self.inequality			= inequality			# float / bool explicitly define global minimum EPC improvement constraint
-		self.flags				= flags					# nsga2.py flags
+		self.flags				= flags.copy()			# nsga2.py flags
+		self.stateLabel			= stateLabel			# string used to separate recurrent step state outputs. Bit dirty, but I need it
 		self.buildingThreads	= []					# Active NSGA2ProcessingThread
 		self.finishedThreads	= []					# Finished NSGA2ProcessingThread
+		if self.inequality:
+			self.flags["inequality"]	= int(self.inequality / self.partitions) + 1 # + 1 because int() is the same as floor()
 	##
 	# Do the stratified NSGA2 optimisation.
 	#
@@ -40,8 +41,14 @@ class NSGA2Community():
 	#			building.getRetrofitByID() that was selected by NSGA2.	
 	##
 	def run(self):
+		# Reset thread arrays
+		self.buildingThreads	= []
+		self.finishedThreads	= []
+		# Partition data for threading
 		buildingSets	= self.buildings.partition(self.partitions)
+		# Alias for filenames
 		counter			= 1
+		# Track duration
 		start			= time()
 		##
 		# The thread loop: runs until everything's been processed
@@ -66,16 +73,16 @@ class NSGA2Community():
 			if len(self.buildingThreads) < self.threadCount:
 				##
 				# Queue up and start the next thread then update the alias counter
+				#
+				# TODO: Flag handling sucks. Do the Flags To String in this class, not as init parameter
 				##
-				flags = self.flags + " --history-path ./test/shoe/%s.csv" %(str(counter))
-				if self.inequality:
-					flags += " --inequality %s" %(int(self.inequality / self.partitions))
+				self.flags["historyPath"] = "./test/shoe/%s%s.csv" %(str(counter), self.stateLabel)
 				if len(buildingSets) > 0:
 					buildingThread	= NSGA2ProcessThread(
 						buildingSets.pop(),
 						self.dataDirectory,
 						str(counter),
-						flags=flags
+						flags=__class__.ParamsToFlagString(self.flags)
 					)
 					buildingThread.start()
 					self.buildingThreads.append(buildingThread)
@@ -93,7 +100,6 @@ class NSGA2Community():
 		buildingSet	= BuildingSet()
 		for thread in self.finishedThreads:
 			buildingSet.merge(thread.results)
-		print("WARNING!!!! You're writing to and from a dictionary with key control. Will break Retrofit relationships")
 		self.results	= buildingSet
 	##
 	# Parse command line arguments: Extends RetrofitNSGA2.ParseCMD()
@@ -169,5 +175,6 @@ class NSGA2Community():
 		flagString = RetrofitNSGA2.ParamsToFlagString(flags)
 		if "stateIdentifier" in flags:
 			flagString += " --state-identifier %s" %(flags["stateIdentifier"])
+		
 		return flagString
 
