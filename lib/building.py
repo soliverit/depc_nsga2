@@ -30,11 +30,12 @@ class Building():
 	##
 	def __init__(self, data, efficiency):
 		## Set variables
-		self.data		= data
-		self.rating		= self.data["CURRENT_ENERGY_RATING"]
-		self.area		= float(self.data["TOTAL_FLOOR_AREA"])
-		self.efficiency	= efficiency
-		self.retrofits	= []
+		self.data			= data									# {} miscellaneous from .csv: default string
+		self.rating			= self.data["CURRENT_ENERGY_RATING"]	# char current EPC rating
+		self.area			= float(self.data["TOTAL_FLOOR_AREA"])	# float net internal area
+		self.efficiency		= efficiency							# float/int current EPC index
+		self.retrofits		= []									# Retrofit[]
+		self.retrofitHash 	= {}
 		## Parse retrofits
 		# As-built (do nothing)
 		retrofit	= Retrofit(
@@ -48,16 +49,13 @@ class Building():
 		for key in RetrofitOption.RETROFIT_OPTION_KEYS:
 			retrofitOption	= RetrofitOption.RETROFIT_OPTION_DICTIONARY[key]
 			efficiency		= floor(float(self.data[retrofitOption.efficiencyKey]))
-			# Skip Retrofits that do less than 1 index point of improvement
-			if efficiency != -1 and efficiency > self.efficiency:
-				cost		= float(self.data[retrofitOption.costKey])
-				retrofit	= Retrofit(
-					retrofitOption,
-					cost,
-					round(efficiency),
-					round(efficiency - self.efficiency)
-				)
-				self.addRetrofit(retrofit)
+			retrofit	= Retrofit(
+				retrofitOption,
+				float(self.data[retrofitOption.costKey]),
+				round(efficiency),
+				round(efficiency - self.efficiency)
+			)
+			self.addRetrofit(retrofit)
 		self.retrofits	= sorted(self.retrofits, key=lambda x: x.impactRatio)
 	##
 	# Determine the number of EPC index points the building's rating needs to be increased
@@ -88,7 +86,15 @@ class Building():
 	#	retrofit:	Retrofit that should be for this Building
 	##
 	def addRetrofit(self, retrofit):
-		self.retrofits.append(retrofit)
+		# We only want to keep sensible Retrofits in the set
+		if retrofit.efficiency != -1:
+			if retrofit.efficiency > self.efficiency: 
+				self.retrofits.append(retrofit)
+			# We keep everything in case we need it because even though
+			# some Retrofit have a point difference < 1 in isolation, they
+			# might have a synergistic relationship with others. It's EPC, 
+			# so counterintuitive synergies aren't off the table.
+			self.retrofitHash[retrofit.name]	= retrofit
 	##
 	# Remov Retrofits with a cost and ratio greater than the inputs
 	#
@@ -140,6 +146,35 @@ class Building():
 				cost	= retrofit.cost
 		return result
 	##
+	# Filter harder Retrofits: Measures you wouldn't select because better options exist.
+	#
+	# If a Retrofit has more RetrofitOptions than another and it's cost is higher and point difference
+	# lower, then it's a worse option - why would you implement two measures for less impact and higher cost.
+	#
+	# Note: There are alternative ways to approach this. Maybe mark as a virtual method for anyone else.
+	##
+	def filterHarderMeasures(self):
+		# Clone the Retrofits so we don't mess with the sort order 
+		retrofits = list(self.retrofits)
+		# Sort so we can say that retrofit2 will always have the same or more measures than retrofit1
+		retrofits.sort(key=lambda retrofit: retrofit.measureCount)
+		# Where the bad Retrofits go to die
+		forRemoval	= list()
+		# Do with every Retrofit.
+		for retrofit1ID in range(self.retrofitCount):
+			retrofit1	= retrofits[retrofit1ID]
+			# Do with all Retrofits from retrofit1 through to the end of the set
+			for retrofit2ID in range(self.retrofitCount - retrofit1ID):
+				retrofit2	= retrofits[retrofit2ID + retrofit1ID]
+				# If the Retrofit has more measures, costs more and has less or equal point difference. Remove it
+				if retrofit1.measureCount < retrofit2.measureCount and retrofit1.cost <= retrofit2.cost and retrofit1.difference >= retrofit2.difference:
+					forRemoval.append(retrofit2)
+		# Get unique Retrofits for removal
+		forRemoval		= set(forRemoval)
+		# Filter out worthless measures
+		self.retrofits	= [retrofit for retrofit in self.retrofits if retrofit not in forRemoval]
+
+	##
 	# Get the self.retrofits ID of the cheapest Retrofit to get to the minimum EPC points (efficiency)
 	#
 	# params:
@@ -149,9 +184,10 @@ class Building():
 	##
 	def getCheapestRetrofitToEfficiencyID(self, efficiency):
 		retrofitID	= 0
-		cost 	= 9999999999999
+		cost 		= 9999999999999
 		for idx in range(len(self.retrofits)):
 			retrofit	= self.retrofits[idx]
 			if retrofit.efficiency >= efficiency and retrofit.cost <  cost:
 				retrofitID	= idx
+				cost 		= retrofit.cost
 		return retrofitID
