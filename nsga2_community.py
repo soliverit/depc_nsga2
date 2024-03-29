@@ -26,7 +26,7 @@ inequality	= buildings.toRatingDifference(params["targetRating"])
 counter 	= 0
 startTime	= time() 
 while counter < params["recurrentSteps"]:
-	community	= NSGA2Community(buildings, "shoe", 
+	community	= NSGA2Community(buildings,
 					partitions=params["partitions"], 
 					threadCount=params["threads"],
 					inequality=inequality,

@@ -1,5 +1,7 @@
 ### Include ###
 ## Native
+from os.path					import isdir
+from os							import mkdir
 from argparse					import ArgumentParser
 from time						import time, sleep
 ## Project
@@ -18,16 +20,21 @@ class NSGA2Community():
 	#	threadCount:	integer number of concurrent threads
 	#	flags:			string command line arguments for nsga2.py
 	## 
-	def __init__(self, buildings, dataDirectory, partitions=8, threadCount=4, inequality=False,flags={},stateLabel=""):
-		self.buildings			= buildings				# BuildingSet
-		self.dataDirectory		= dataDirectory + "/"	# Directory where files are saved
-		self.partitions			= partitions			# Number of BuildingSets
-		self.threadCount		= threadCount			# Number of concurrent threads
-		self.inequality			= inequality			# float / bool explicitly define global minimum EPC improvement constraint
-		self.flags				= flags.copy()			# nsga2.py flags
-		self.stateLabel			= stateLabel			# string used to separate recurrent step state outputs. Bit dirty, but I need it
-		self.buildingThreads	= []					# Active NSGA2ProcessingThread
-		self.finishedThreads	= []					# Finished NSGA2ProcessingThread
+	def __init__(self, buildings, dataDirectory=False,  partitions=8, threadCount=4, inequality=False,flags={},stateLabel=""):
+		self.buildings			= buildings			# BuildingSet
+		self.partitions			= partitions		# Number of BuildingSets
+		self.threadCount		= threadCount		# Number of concurrent threads
+		self.inequality			= inequality		# float / bool explicitly define global minimum EPC improvement constraint
+		self.flags				= flags.copy()		# nsga2.py flags
+		self.stateLabel			= stateLabel		# string used to separate recurrent step state outputs. Bit dirty, but I need it
+		self.buildingThreads	= []				# Active NSGA2ProcessingThread
+		self.finishedThreads	= []				# Finished NSGA2ProcessingThread
+		if dataDirectory:							# Directory where files are saved
+			self.dataDirectory		= "./processing/" + dataDirectory
+		else:
+			self.dataDirectory		= "./processing/" + str(time()).replace(".", "") + "/"
+		if not self.dataDirectory[-1] == "/":
+			self.dataDirectory += "/"
 		if self.inequality:
 			self.flags["inequality"]	= int(self.inequality / self.partitions) + 1 # + 1 because int() is the same as floor()
 	##
@@ -50,10 +57,14 @@ class NSGA2Community():
 		counter			= 1
 		# Track duration
 		start			= time()
+		# Make sure data directory exists
+		if not isdir(self.dataDirectory):
+			mkdir(self.dataDirectory)
 		##
 		# The thread loop: runs until everything's been processed
 		##
 		while True:
+			self.flags["writeState"] = "%s%s%s.stt" %(self.dataDirectory,str(counter), self.stateLabel)
 			##
 			# Finsihed thread handling
 			##
@@ -76,12 +87,12 @@ class NSGA2Community():
 				#
 				# TODO: Flag handling sucks. Do the Flags To String in this class, not as init parameter
 				##
-				self.flags["historyPath"] = "./test/shoe/%s%s.csv" %(str(counter), self.stateLabel)
 				if len(buildingSets) > 0:
 					buildingThread	= NSGA2ProcessThread(
 						buildingSets.pop(),
 						self.dataDirectory,
 						str(counter),
+						str(self.stateLabel),
 						flags=__class__.ParamsToFlagString(self.flags)
 					)
 					buildingThread.start()
@@ -119,7 +130,6 @@ class NSGA2Community():
 		parser.add_argument("--population", type=int, help="Set population size")
 		parser.add_argument("--children", type=int, help="Set number of children")
 		parser.add_argument("--best-initial-states", help="Use cheapest building-locked as the intial states", action="store_true")
-		parser.add_argument("--write-state", help="Append results to the BuildingSet and write new file", action="store_true")
 		parser.add_argument("--history-path", type=str, help="Where to write the CSV results?")
 		parser.add_argument("--target-rating", type=str, help="Minimum EPC rating that defines the GA constraint")
 		parser.add_argument("--threads", type=int, help="Number of concurrent RetrofitNSGA2 threads")
@@ -144,7 +154,6 @@ class NSGA2Community():
 		partitions			= args.partitions if args.partitions else 2
 		recurrentSteps		= args.recurrent_steps if args.recurrent_steps else 1
 		verbose				= args.verbose
-		writeState			= args.write_state
 		silent				= args.silent
 		bestInitalStates	= args.best_initial_states
 		inequality			= args.inequality if args.inequality else False
@@ -162,7 +171,6 @@ class NSGA2Community():
 			"children":				children,
 			"verbose":				verbose,
 			"bestInitialStates":	bestInitalStates,
-			"writeState":			writeState,
 			"silent":				silent,
 			"targetRating":			targetRating,
 			"threads":				threads,
@@ -175,6 +183,8 @@ class NSGA2Community():
 		flagString = RetrofitNSGA2.ParamsToFlagString(flags)
 		if "stateIdentifier" in flags:
 			flagString += " --state-identifier %s" %(flags["stateIdentifier"])
-		
+		if "writeState" in flags:
+			flagString	+= " --write-state %s" %(flags["writeState"])
+
 		return flagString
 

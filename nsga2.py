@@ -1,6 +1,6 @@
 ### Includes ###
 ## Native 
-
+from numpy							import array
 from random 						import random
 from os.path						import isfile
 ## Project
@@ -16,11 +16,14 @@ from lib.historian					import Historian
 params		= RetrofitNSGA2.ParseCMD()
 ## File path stuff
 # The alias for files
-dataCode	= "./data/" + params["dataCode"] 
 # The input data path
-dataPath	= dataCode + ".csv"
-# The post-process state path. Write the BuildingSet with optimal state included
-statePath	= dataCode + ".stt"
+if "/" in params["dataCode"]:
+	dataPath	= params["dataCode"] + ".csv"
+else:
+	dataPath	= "./data/%s.csv" %(params["dataCode"]) 
+
+
+
 # Make sure the input actually exists
 if not isfile(dataPath):
 	print("Data path: " + dataPath + " not found")
@@ -48,7 +51,6 @@ problem		= CostProblem(buildings, inequality)
 # Create initial states
 bestInitialState	= buildings.getCheapestToRatingState("D")
 initialStates		= []
-
 if params["bestInitialStates"]:
 	for i in range(params["population"]):
 		if  params["stateIdentifier"]:
@@ -63,7 +65,7 @@ if params["bestInitialStates"]:
 					initialStates.append(v)
 				else:
 					initialStates.append(0)
-	initialStates	= np.array(initialStates)
+	initialStates	= array(initialStates)
 # Build it.
 retrofitGA	= RetrofitNSGA2(problem,
 	generations=params["generations"],
@@ -87,5 +89,7 @@ if not params["silent"]:
 	retrofitGA.printResults()
 if params["historyPath"]:
 	retrofitGA.writeHistory(params["historyPath"])
+
 if params["writeState"]:
-	retrofitGA.writeState(statePath)
+	print(params["writeState"])
+	retrofitGA.writeState(params["writeState"])

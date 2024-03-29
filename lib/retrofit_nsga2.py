@@ -167,7 +167,7 @@ class RetrofitNSGA2():
 				"sorted",
 			]) + "\n")
 	def writeState(self, path):
-		bestLastResult	= self.lastResult.X[-1]
+		bestLastResult	= self.results.findBest().states
 		for i, building in enumerate(self.problem.buildings):
 			building.data["BEST_TEAM_STATE"] = floor(bestLastResult[i])
 		with open(path, "w") as csvfile:
@@ -192,7 +192,7 @@ class RetrofitNSGA2():
 		parser.add_argument("--population", type=int, help="Set population size")
 		parser.add_argument("--children", type=int, help="Set number of children")
 		parser.add_argument("--best-initial-states", help="Use cheapest building-locked as the intial states", action="store_true")
-		parser.add_argument("--write-state", help="Append results to the BuildingSet and write new file", action="store_true")
+		parser.add_argument("--write-state", type=str, help="Append results to the BuildingSet and write new file")
 		parser.add_argument("--history-path", type=str, help="Where to write the CSV results?")
 		parser.add_argument("--target-rating", type=str, help="Minimum EPC rating that defines the GA constraint")
 		parser.add_argument("--state-identifier", type=str, help="A CSV column name that indicates a Retrofit ID used for creating the initial population. In conjunction with --best-initial-states")
@@ -269,7 +269,7 @@ class RetrofitNSGA2():
 		if "bestInitialStates" in params and params["bestInitialStates"]:
 			flagString += " --best-initial-states"
 		if "writeState" in params:
-			flagString	+= " --write-state"
+			flagString	+= " --write-state %s" %(params["writeState"]) 
 		if "silent" in params and params["silent"]:
 			flagString	+= " --silent"
 		if "targetRating" in params:

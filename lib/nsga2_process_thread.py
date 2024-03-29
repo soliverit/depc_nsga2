@@ -12,7 +12,7 @@ from lib.building_set	import BuildingSet
 # A class for threaded nsga2.py processing. Use this to run nsga2.py n the background
 ##
 class NSGA2ProcessThread(Thread):
-	def __init__(self, buildings, directory, code, flags=""):
+	def __init__(self, buildings, directory, code, iteration, flags=""):
 		super().__init__()
 		self.buildings	= buildings			# BuildingSet
 		self.directory	= directory			# string Directory where files are saved / read from
@@ -20,11 +20,8 @@ class NSGA2ProcessThread(Thread):
 		self.flags		= flags				# string nsga2.py command line parameters string
 		self.finished	= False				# bool process has finished
 		self.results	= False				# BuildingSet from .stt file. Same as BuildingSet NSGA2 selection in building.data
-		## TODO: Refactor "./data/" out of this from the dataPath statement in
-		# ./example.py (soon to be nsga2.py)
-		self.directory	= "./data/" +  directory 
 		self.filePath	= self.directory + code + ".csv" # string csv input file path
-		self.sttPath	= self.directory +  directory  + code + ".stt" # string stt output path (just a csv with a convenient extension change)
+		self.sttPath	= self.directory  + code + iteration + ".stt" # string stt output path (just a csv with a convenient extension change)
 	##
 	# Run the thread process
 	#
