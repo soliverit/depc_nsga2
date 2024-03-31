@@ -19,7 +19,7 @@ Takes a csv of retrofits for multiple buildings and finds near-optimal strageies
 - PyMOO `pip install pymoo`
 - Bayseian-Optimisation `pip install bayesian-optimization`
 ### Example
-The example is straightforward. Just run `python example.py` 
+The example is straightforward. Just run `python nsga2.py` 
 - Add `--summary` to see the NSGA-II and Problem configuration.
 - Add `-h` to list command line parameters
 #### Output
