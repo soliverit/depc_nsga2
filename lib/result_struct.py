@@ -12,5 +12,6 @@ class ResultStruct():
 	def __init__(self, cost, points, states, objectives):
 		self.cost		= cost			# float
 		self.points		= points		# int
+		self.score		= cost / points	# float 
 		self.states		= states		# int[]
 		self.objectives	= objectives	# float[]
