@@ -1,4 +1,4 @@
-DEPC-NSGA-II: Standard and stratified parallel optimisation 
+# DEPC-NSGA-II: Set and threaded subset optimisation tools
 An NSGA-II estate retrofit strategy generator and Bayesian optimisation model for tuning NSGA-II hyperparameters.
 
 ## Features
@@ -19,7 +19,7 @@ Takes a csv of retrofits for multiple buildings and finds near-optimal strageies
 - PyMOO `pip install pymoo`
 - Bayseian-Optimisation `pip install bayesian-optimization`
 ### Example
-The example is straightforward. Just run `python example.py` 
+The example is straightforward. Just run `python nsga2.py` 
 - Add `--summary` to see the NSGA-II and Problem configuration.
 - Add `-h` to list command line parameters
 #### Output
