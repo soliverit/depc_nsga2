@@ -26,11 +26,9 @@ class XGBoostEstimator(EstimatorBase):
 		self.rateDrop		= 0.08
 		self.skipDrop		= 0.4
 		self.nRounds		= 2000
-		self.useCMDParams	= True
 	@property
 	def params(self):
 		if self.__class__.parser and self.useCMDParams:
-			print("SHOE")
 			properties	= vars(self.__class__.parser.parse_args())
 			params = {
 				"booster": 			properties["booster"],
