@@ -91,5 +91,4 @@ if params["historyPath"]:
 	retrofitGA.writeHistory(params["historyPath"])
 
 if params["writeState"]:
-	print(params["writeState"])
 	retrofitGA.writeState(params["writeState"])
