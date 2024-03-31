@@ -1,5 +1,12 @@
-# DEPC-NSGA-II: Set and threaded subset optimisation tools
-An NSGA-II estate retrofit strategy generator and Bayesian optimisation model for tuning NSGA-II hyperparameters.
+# The Oliver-Rahimian-Seyedzadeh (ORS) retrofit analysis toolkit 
+A toolkit for dveloping machine learning models and optimisation algorithms large-scale retrofit analysis. Tailored for national domestic retrofit studies, designed to be adaptable for broader studies. 
+
+### Includes:
+- NSGA-II optimisation
+- NSGA-II recurrent, threaded subset optimisation
+- XGBoost and sklearn estimator wrappers
+- Hyperopt hyperparameter tuning for estimators and genetic algorithms
+- Bayesian-optimisation for genetic algorithms
 
 ## Features
  - **NSGA2**: A nondominated sorting genetic algorithm for residential EPCs.
@@ -8,16 +15,21 @@ An NSGA-II estate retrofit strategy generator and Bayesian optimisation model fo
 Takes a csv of retrofits for multiple buildings and finds near-optimal strageies for improving the overall target score. 
 
 ### Features
-`nsga2.py` The script that processes datasets as a whole
+`nsga2.py` The NSGA-II that optimises datasets as a whole
 
 `nsga2_community.py` The script that processes datasets in subsets
 
-`bayes_optimiser.py` A Bayesian optimisiation process for tuning NSGA-II hyperparameters.
+`nsga2_bayes_hp_tuner.py` A Bayesian optimisiation process for tuning NSGA-II hyperparameters.
+
+`nsga2_community_bayes_hp_tuner.py` A Bayesian optimisiation process for tuning NSGA-II hyperparameters.
+
+`estimator.py` A script for generating machine learning optimisers. Intended for the project, will work with any data, though.
+
+`estimator_hyperopt_hp_tuner.py` Hyperopt hyperparameter tuning for estimators.
 
 ## Getting started
 ### Prerequisites
-- PyMOO `pip install pymoo`
-- Bayseian-Optimisation `pip install bayesian-optimization`
+Install dependencies: `pip install -r requirements.txt`
 ### Example
 The example is straightforward. Just run `python nsga2.py` 
 - Add `--summary` to see the NSGA-II and Problem configuration.
@@ -68,7 +80,7 @@ Output from running `python nsga2.py  --code 11k --gen 10000 --population 100 --
 
 `--threads` Number of concurrent processses
 
-`--recurrent-step` The number of times results are fed back into the processor.
+`--recurrent-steps` The number of times results are fed back into the processor.
 
 ### Data format
 In the example using results created by https://github.com/soliverit/depc_emulator using the Building and Retrofit base classes, each row has three key component:
