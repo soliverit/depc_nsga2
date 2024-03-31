@@ -1,4 +1,4 @@
-DEPC-NSGA-II: Standard and stratified parallel optimisation 
+# DEPC-NSGA-II: Standard and stratified parallel optimisation 
 An NSGA-II estate retrofit strategy generator and Bayesian optimisation model for tuning NSGA-II hyperparameters.
 
 ## Features
