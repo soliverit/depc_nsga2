@@ -8,7 +8,7 @@ class PrintHelper():
 	# Output: string padded. E.g input="Fire", length=6, padChar="-" outputs "Fire--"
 	##
 	@staticmethod
-	def pad(input, length, padChar=" "):
+	def Pad(input, length, padChar=" "):
 		input	= str(input)
 		while len(input) < length:
 			input += padChar
@@ -18,5 +18,5 @@ class PrintHelper():
 	#
 	# Output: string concatenated padded values
 	##
-	def padArray(array, length, padChar=" "):
-		return "".join([ __class__.pad(val, length, padChar) for val in array])
+	def PadArray(array, length, padChar=" "):
+		return "".join([ __class__.Pad(val, length, padChar) for val in array])
