@@ -17,9 +17,10 @@ if not params["no_summary"]:
 # Load data
 if not isfile(params["data"]):
 	print("Error: input data path not found: %s" %(params["data"]))
-data	= read_csv(params["data"])
+data				= read_csv(params["data"])
 # Create model
-model	= constructor(data, params["target"])
+model				= constructor(data, params["target"])
+model.useCMDParams	= params["use_cmd_config"]
 # Train 
 model.train()
 # Test

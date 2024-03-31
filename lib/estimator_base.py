@@ -39,10 +39,11 @@ class EstimatorBase():
 	#	trainTestSplit:		float 0 < x < 1 split of data for training and testing. x = train size
 	##
 	def __init__(self, trainData, target, trainTestSplit=0.5):
-		self.data		= trainData
+		self.data			= trainData
 		self.target			= target
 		self.trainTestSplit	= trainTestSplit
 		self.model			= False
+		self.useCMDParams	= True
 	##
 	# Get training data  with target
 	##
@@ -115,4 +116,5 @@ class EstimatorBase():
 		cls.parser.add_argument("--train-split", type=float, default=0.5, help="Test train split: 0 < split < 1")
 		cls.parser.add_argument("--no-summary",  default=False, help="Print estimator config.", action="store_true")
 		cls.parser.add_argument("--constructor", type=str, default="XGBoostEstimator", help="Estimator constructor name: Anything from ./lib/estimators/")
+		cls.parser.add_argument("--use-cmd-config", default=True, help="Ignore cmd defaults params for Estimator")
 		return vars(cls.parser.parse_args())
