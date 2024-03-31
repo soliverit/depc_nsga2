@@ -25,9 +25,7 @@ def optimise(params):
 	for key in list(model.__class__.HYPEROPT_HP_TUNER_PARAMS):
 		setattr(model, key, params[key])
 	model.train()
-	rmse	=  model.test()["rmse"]
-	print(rmse)
-	return rmse
+	return model.test()["rmse"]
 # Define the optimization algorithm
 algo = tpe.suggest
 
