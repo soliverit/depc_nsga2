@@ -3,17 +3,17 @@
 from xgboost				import DMatrix, train
 from hyperopt.hp			import uniform, uniformint
 ## Project
-from lib.estimator_base	import EstimatorBase
+from lib.estimator_base		import EstimatorBase
 ##
 # XGBoost estimator: An estimator using XGBoost 2
 ##
 class XGBoostEstimator(EstimatorBase):
 	HYPEROPT_HP_TUNER_PARAMS	= {
-		"learningRate":	uniform("learningRate", 0.01, 0.5),
-		"rateDrop":		uniform("rateDrop", 0.01, 0.25),
+		"learningRate":	uniform("learningRate", 0.03, 0.3),
+		"rateDrop":		uniform("rateDrop", 0.01, 0.2),
 		"skipDrop":		uniform("skipDrop", 0.3, 0.7),
-		"maxDepth":		uniformint("maxDepth", 2, 20),
-		"nRounds":		uniformint("nRounds", 500, 501)
+		"maxDepth":		uniformint("maxDepth", 2, 10),
+		"nRounds":		uniformint("nRounds", 700, 1200)
 	}
 	def __init__(self, trainData, target, trainTestSplit=0.5):
 		super().__init__(trainData, target, trainTestSplit=trainTestSplit)
@@ -38,10 +38,13 @@ class XGBoostEstimator(EstimatorBase):
 				"sample_type": 		properties["sample_type"],
 				"normalize_type": 	properties["normalise_type"],
 				"rate_drop": 		properties["rate_drop"],
+				"gamma":			properties["gamma"]
 			}
 			self.nRounds	= properties["n_rounds"]
 			if params["booster"] == "dart":
 				params["skip_drop"]	= properties["skip_drop"]
+			if "train_split" in properties:
+				self.trainTestSplit	= properties["train_split"]
 		else:
 			params =  {
 				"booster": 			self.booster,
@@ -67,12 +70,19 @@ class XGBoostEstimator(EstimatorBase):
 		del data[self.target]
 		return DMatrix(data)
 	def train(self):
+		# WARNING!!! Always do params first! They change inline configs like train_test_split
+		# TODO: Make params use underscore so we don't have to bridge it awkwardly
+		params		= self.params
 		data 		= DMatrix(self.trainingInputs, self.trainingTargets)
-		self.model 	= train(self.params, data, self.nRounds)
+		self.model 	= train(params, data, self.nRounds)
+	def extraConfigParams(self):
+		return {
+			"nRounds":	self.nRounds
+		}
 	@classmethod
 	def AddAdditionalCmdParams(cls):
 		cls.parser.add_argument("--booster", type=str, default="dart", help="XGBoost booster type")
-		cls.parser.add_argument("--max-depth", type=int, default=5, help="XGBoost booster type")
+		cls.parser.add_argument("--max-depth", type=int, default=6, help="")
 		cls.parser.add_argument("--learning-rate", type=float, default=0.1, help="Learning rate")
 		cls.parser.add_argument("--objective", type=str, default="reg:squarederror", help="Model objective. Determines if regressor or classifier. E.g reg:sqaurederror for regressor RMSE scored")
 		cls.parser.add_argument("--sample-type", type=str, default="uniform", help="Sampling method. E.g, uniform")
@@ -80,3 +90,4 @@ class XGBoostEstimator(EstimatorBase):
 		cls.parser.add_argument("--rate-drop", type=float, default=0.1, help="Drop rate")
 		cls.parser.add_argument("--skip-drop", type=float, default=0.5, help="Dart booster, skip drop probability")
 		cls.parser.add_argument("--n-rounds", type=int, default=100, help="Same as n_estiamtors with GBDT")
+		cls.parser.add_argument("--gamma", default=0, type=float, help="Minimum loss reduction before further dividing samples again")
