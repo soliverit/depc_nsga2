@@ -14,26 +14,33 @@ params		= constructor.ParseCMD()
 if not isfile(params["data"]):
 	print("Error: data path doesn't exist: %s" %(params["data"]))
 	exit()
-data	= read_csv(params["data"])
 ### Let's do it! ###
 # Create a base estimator
-model				= constructor(data, params["target"])
-model.useCMDParams	= False
+model					= constructor.QuickLoad(params["data"], params["target"])
+model.trainTestSplit	= params["train_split"]
+model.useCMDParams		= False
 # Define the optimiser
 def optimise(params):
 	global model # Yeah, yeah. Boo global. Saves reloading the data everytime
 	for key in list(model.__class__.HYPEROPT_HP_TUNER_PARAMS):
-		setattr(model, key, params[key])
+		# Because optimisation libraries can fathom anything that's not float64 when the give results
+		value = int(params[key]) if int(params[key]) == params[key] else params[key]
+		setattr(model, key, value)
 	model.train()
 	return model.test()["rmse"]
-# Define the optimization algorithm
-algo = tpe.suggest
-
-# Initialize a Trials object to track the progress
-trials = Trials()
 
 # Run the optimization
-best = fmin(optimise, constructor.HYPEROPT_HP_TUNER_PARAMS, algo=algo, max_evals=100, trials=trials)
-
+best = fmin(
+	optimise, 
+	constructor.HYPEROPT_HP_TUNER_PARAMS, 
+	algo=tpe.suggest,
+	max_evals=100, 
+	trials=Trials()
+)
+# Print the parameters so it wasn't for nothing
 print("Best parameters:", best)
+# Apply parameters and run the model
+optimise(best)
+model.train()
+print(model.test())
 
