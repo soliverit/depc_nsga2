@@ -11,16 +11,17 @@ from lib.estimators.xgboost_estimator	import XGBoostEstimator
 constructor	= EstimatorBase.GetConstructor()
 # Parse the rest of the CMD flags, including class-specific parameters
 params	= constructor.ParseCMD()
-# Print config to console
-if not params["no_summary"]:
-	constructor.PrintConfig()
-# Load data
+
 if not isfile(params["data"]):
 	print("Error: input data path not found: %s" %(params["data"]))
-data				= read_csv(params["data"])
 # Create model
-model				= constructor(data, params["target"])
-model.useCMDParams	= params["use_cmd_config"]
+model					= constructor.QuickLoad(params["data"], params["target"])
+model.trainTestSplit	= params["train_split"]
+model.useCMDParams		= params["use_cmd_config"]
+# Print config to console
+if not params["no_summary"]:
+	model.printModelConfig()
+# Load data
 # Train 
 model.train()
 # Test
