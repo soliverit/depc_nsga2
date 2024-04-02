@@ -8,7 +8,7 @@ from lib.result_struct	import ResultStruct
 # Buildings the state applies to without cloning the
 # BuildingSet for every ResultStruct
 ##
-class ResultStructSet():
+class ResultSet():
 	##
 	# params:
 	#	buildings:	BuildingSet of Buildings the state ResultStruct states applies to

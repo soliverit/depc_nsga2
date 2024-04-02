@@ -12,7 +12,7 @@ from pymoo.termination 				import get_termination
 from math							import floor
 ## Project
 from lib.print_helper				import PrintHelper
-from lib.result_struct_set			import ResultStructSet
+from lib.result_set					import ResultSet
 ##
 # Retrofit NSGA-II
 ##
@@ -42,7 +42,7 @@ class RetrofitNSGA2():
 		self.mutationModel	= PM
 		## Sampler parameters
 		self.sampler		= IntegerRandomSampling()
-		## ResultStructSet holder. I hate _* vars, but it works best for this
+		## ResultSet holder. I hate _* vars, but it works best for this
 		self._results		= False
 	##
 	# Create a crossover model
@@ -104,15 +104,15 @@ class RetrofitNSGA2():
 		)
 		self.time	= time() - start
 	##
-	# Get the ResultStructSet fro the last run(). Build it if necessary
+	# Get the ResultSet fro the last run(). Build it if necessary
 	#
-	# output:	ResultStructSet
+	# output:	ResultSet
 	##
 	@property
 	def results(self):
 		if self._results:
 			self._results 
-		self._results	= ResultStructSet(self.problem.buildings.clone())
+		self._results	= ResultSet(self.problem.buildings.clone())
 		for i in range(len(self.lastResult.X)):
 			cost 	= 0.0
 			points	= 0.0
