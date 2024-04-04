@@ -45,10 +45,9 @@ class XGBoostEstimator(EstimatorBase):
 		if self.booster == "dart":
 			params["skip_drop"]	= self.skipDrop
 		return params
-	def preprocessInputs(self, data):
-		if self.target in data:
-			del data[self.target]
-		return DMatrix(data)
+	##
+	# Train the model (Abstract)
+	##
 	def train(self):
 		# WARNING!!! Always do params first! They change inline configs like train_test_split
 		# TODO: Make params use underscore so we don't have to bridge it awkwardly
@@ -62,6 +61,12 @@ class XGBoostEstimator(EstimatorBase):
 		return {
 			"nRounds":	self.nRounds
 		}
+	##
+	# Convert DataFrame to native data type (Virtual)
+	##
+	@classmethod
+	def DataFrameToInputType(cls, data):
+		return DMatrix(data)
 	##
 	# Apply CMD parameters (override Abstract)
 	##
@@ -79,6 +84,9 @@ class XGBoostEstimator(EstimatorBase):
 		self.skipDrop		= args.skip_drop		if args.skip_drop else self.skipDrop
 		self.nRounds		= args.n_rounds			if args.n_rounds else self.nRounds
 		self.gamma			= args.gamma			if args.gamma else self.gamma
+	##
+	# Add XGBoost-specific CMD params (Virtual)
+	##
 	@classmethod
 	def AddAdditionalCmdParams(cls):
 		cls.parser.add_argument("--booster", type=str,  help="XGBoost booster type")

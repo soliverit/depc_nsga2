@@ -156,7 +156,7 @@ class EstimatorBase():
 	def test(self):
 		if not self.model:
 			self.train()
-		predictions	= self.predict(self.preprocessInputs(self.testInputs))
+		predictions	= self.predict(__class__.DataFrameToInputType(self.preprocessInputs(self.testInputs)))
 		return {
 			"r2":	r2_score(predictions, self.testTargets),
 			"rmse":	mean_squared_error(predictions, self.testTargets) ** 0.5,
@@ -168,7 +168,7 @@ class EstimatorBase():
 	# output:	Array of predictions/estimates
 	##
 	def predict(self, data):
-		return self.model.predict(data)
+		return self.model.predict(self.__class__.DataFrameToInputType(data))
 	##
 	# Get R2 without including it in every script uses an EstimatorBase object
 	#
@@ -224,6 +224,15 @@ class EstimatorBase():
 	##
 	def applyCMDParams(self):
 		raise "%s doesn't override applyCMDParams instance method"
+	##
+	# Convert DataFrame to native data type (Virtual)
+	#
+	# Convert a DataFrame to the data type expected by the model. This
+	# mainly exists for XGBoost's DMatrix. Most don't need it.
+	##
+	@classmethod
+	def DataFrameToInputType(cls, data):
+		return data
 	##
 	# Print summary of Estimator base CMD line arguments.
 	## 
