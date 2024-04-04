@@ -1,11 +1,11 @@
 ### Include ###
 ## Native
-from importlib			import import_module
-from inspect			import getmembers, isclass, getmodule
-from argparse			import ArgumentParser
-from pandas				import read_csv
-from sklearn.metrics 	import r2_score, mean_absolute_error, mean_squared_error
-
+from importlib				import import_module
+from inspect				import getmembers, isclass, getmodule
+from argparse				import ArgumentParser
+from pandas					import read_csv
+from sklearn.metrics 		import r2_score, mean_absolute_error, mean_squared_error
+from sklearn.preprocessing	import Normalizer, StandardScaler
 ## Project
 from lib.print_helper	import PrintHelper
 ##
@@ -39,12 +39,18 @@ class EstimatorBase():
 	#	target:				string feature name (of column in trainData)
 	#	trainTestSplit:		float 0 < x < 1 split of data for training and testing. x = train size
 	##
-	def __init__(self, trainData, target, trainTestSplit=0.5):
-		self.data			= trainData
-		self.target			= target
-		self.trainTestSplit	= trainTestSplit
-		self.model			= False
-		self.useCMDParams	= True
+	def __init__(self, trainData, target, trainTestSplit=0.5, customParams={}, 
+			  scaler=StandardScaler(), normaliser=Normalizer()):
+		self.data				= trainData			# DataFrame with features and target
+		self.target				= target			# string target label
+		self.trainTestSplit		= trainTestSplit	# float train/test split
+		self.model				= False				# Trained model (XGBoost, MLP, or whatever)
+		self.scaler				= scaler			# sklearn.preprocessing Scaler
+		self.normaliser			= normaliser		# sklearn.preprocessing Normaliser
+		self.applyScaler		= False				# bool apply scaler during preprocessing inputs
+		self.applyNormaliser	= False				# bool apply normaliser during preprocessing inputs
+		self.customParams		= customParams		# dict of params not covered by the default model
+
 	##
 	# Get training data  with target
 	#
@@ -98,6 +104,22 @@ class EstimatorBase():
 	def testTargets(self):
 		return self.data[self.target].values[ int(len(self.data) * self.trainTestSplit) : ]
 	##
+	# Preprocess input data (Virtual)
+	#
+	# Use this method to apply Scaler, Normalisers, whatever
+	##
+	def preprocessInputs(self, data):
+		if self.applyScaler and self.scaler:
+			data	= self.scaler.fit_transform(data)
+		if self.applyNormaliser and self.normaliser:
+			data	= self.normaliser.fit_transform(data)
+		return data
+	##
+	# Preprocess targets (Virtual)
+	##
+	def preprocessTargets(self, targets):
+		return targets
+	##
 	# Train model (Abstract)
 	#
 	# Train the model so you can make estimates
@@ -114,8 +136,18 @@ class EstimatorBase():
 	# 
 	# output:	{} or custom. Whatever's needed for the train method. Ideally, subscripted
 	##
+	@property
 	def params(self):
 		raise "%s doesn't override abstract params method of EstimatorBase" %(__class__.__name__)
+	##
+	# Get all params: self.params + self.customParams
+	##
+	@property
+	def allParams(self):
+		params	= self.params
+		for key in list(self.customParams):
+			params[key]	= self.customParams[key]
+		return params
 	##
 	# Run test using test data and return RMSE, R2, and MAE scores 
 	#
@@ -124,7 +156,7 @@ class EstimatorBase():
 	def test(self):
 		if not self.model:
 			self.train()
-		predictions	= self.predict(self.testInputs)
+		predictions	= self.predict(self.preprocessInputs(self.testInputs))
 		return {
 			"r2":	r2_score(predictions, self.testTargets),
 			"rmse":	mean_squared_error(predictions, self.testTargets) ** 0.5,
@@ -173,7 +205,7 @@ class EstimatorBase():
 	# Print summary of the model config.
 	##
 	def printModelConfig(self):
-		config					= self.params
+		config					= self.allParams
 		config["train size"]	= int(len(self.data) * self.trainTestSplit)
 		config["Test size"]		= int(len(self.data) - len(self.data) * self.trainTestSplit)
 		for key, value in self.extraConfigParams().items():
@@ -187,6 +219,11 @@ class EstimatorBase():
 	################
 	# Argument parsing and related stuff
 	################
+	##
+	# Apply CMD arguments (Abstract)
+	##
+	def applyCMDParams(self):
+		raise "%s doesn't override applyCMDParams instance method"
 	##
 	# Print summary of Estimator base CMD line arguments.
 	## 
@@ -218,6 +255,8 @@ class EstimatorBase():
 	##
 	@classmethod
 	def ParseCMD(cls):
+		if hasattr(cls, "parser"):
+			return
 		cls.parser	= ArgumentParser("Estimator arg parser")
 		# Ad class-specific  parameters
 		cls.AddAdditionalCmdParams()
@@ -227,5 +266,5 @@ class EstimatorBase():
 		cls.parser.add_argument("--train-split", type=float, default=0.5, help="Test train split: 0 < split < 1")
 		cls.parser.add_argument("--no-summary",  default=False, help="Print estimator config.", action="store_true")
 		cls.parser.add_argument("--constructor", type=str, default="XGBoostEstimator", help="Estimator constructor name: Anything from ./lib/estimators/")
-		cls.parser.add_argument("--use-cmd-config", default=True, help="Ignore cmd defaults params for Estimator")
+		cls.parser.add_argument("--skip-cmd-config", default=False, help="Ignore cmd defaults params for Estimator", action="store_true")
 		return vars(cls.parser.parse_args())
