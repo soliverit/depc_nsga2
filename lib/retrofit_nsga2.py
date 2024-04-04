@@ -166,6 +166,9 @@ class RetrofitNSGA2():
 				str(self.time),
 				"sorted",
 			]) + "\n")
+	##
+	# Write the .csv with the .stt file extension, includes state column labeled BEST_TEAM_STATE
+	##
 	def writeState(self, path):
 		bestLastResult	= self.results.findBest().states
 		for i, building in enumerate(self.problem.buildings):
