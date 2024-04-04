@@ -4,6 +4,11 @@ from sklearn.ensemble	import GradientBoostingRegressor
 from hyperopt.hp		import uniform, uniformint
 ## Project
 from lib.estimator_base	import EstimatorBase
+##
+# Gradient-boosting Regressor, curtesy of sklearn.ensemble
+#
+# A wrapper for sklearn's GradientBoostingRegressor
+##
 class GBDTEstimator(EstimatorBase):
 	##
 	# Hyperparameters definitions for Hyperopt
@@ -17,10 +22,15 @@ class GBDTEstimator(EstimatorBase):
 	def __init__(self, data, target, trainTestSplit=0.5, nEstimators=100, learningRate=0.1,
 			  minSamplesSplit=30, minSamplesLeaf=24):
 		super().__init__(data, target, trainTestSplit=trainTestSplit)
-		self.nEstimators		= nEstimators
-		self.learningRate		= learningRate
-		self.minSamplesSplit	= minSamplesSplit
-		self.minSamplesLeaf		= minSamplesLeaf
+		self.nEstimators		= nEstimators		# int number of estimators/rounds
+		self.learningRate		= learningRate		# float step size
+		self.minSamplesSplit	= minSamplesSplit	# int min  samples for a split
+		self.minSamplesLeaf		= minSamplesLeaf	# int min samples for leafs
+	##
+	# Get model parameters (override Abstract)
+	#
+	# output:	Dict of mixed value parameters for the learner
+	##
 	@property
 	def params(self):
 		return {

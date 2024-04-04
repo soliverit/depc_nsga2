@@ -24,7 +24,7 @@ class BuildingSet():
 		self.buildings	= []
 		self.area 		= 0.0
 	##
-	# Write to file
+	# Write to file in csv format with headers
 	##
 	def writeFile(self, path):
 		with open(path, "w") as csvfile:

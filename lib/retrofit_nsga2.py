@@ -167,7 +167,9 @@ class RetrofitNSGA2():
 				"sorted",
 			]) + "\n")
 	##
-	# Write the .csv with the .stt file extension, includes state column labeled BEST_TEAM_STATE
+	# Write the .csv with the .stt file extension.
+	#
+	# Write a csv that includes a column with the Retrofit ID
 	##
 	def writeState(self, path):
 		bestLastResult	= self.results.findBest().states
@@ -179,7 +181,13 @@ class RetrofitNSGA2():
 			writer.writeheader()
 			for building in self.problem.buildings:
 				writer.writerow(building.data)
-
+	##
+	# Parse command line parameters. 
+	#
+	# output:	Dict of mixed value parameters.
+	#
+	# Note: Implemented this early in the project. Wish I'd done it like EstimatorBase children.
+	##
 	@staticmethod
 	def ParseCMD():
 		parser = ArgumentParser(description="Domestic EPC retrofit strategy maker")
@@ -250,6 +258,9 @@ class RetrofitNSGA2():
 			"stateIdentifier":		stateIdentifier,
 			"inequality":			inequality
 		}
+	##
+	# 
+	##
 	@staticmethod
 	def ParamsToFlagString(params):
 		flagString	= ""

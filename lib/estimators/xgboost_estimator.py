@@ -29,6 +29,11 @@ class XGBoostEstimator(EstimatorBase):
 		self.skipDrop		= skipDrop
 		self.nRounds		= nRounds
 		self.gamma			= gamma
+	##
+	# Get model parameters (override Abstract)
+	#
+	# output:	Dict of mixed value parameters for the learner
+	##
 	@property
 	def params(self):
 		params =  {

@@ -12,11 +12,19 @@ from lib.building_set	import BuildingSet
 # A class for threaded nsga2.py processing. Use this to run nsga2.py n the background
 ##
 class NSGA2ProcessThread(Thread):
+	##
+	# params:
+	#	buildings:		BuildingSet
+	#	directory:		string path to processing folder
+	#	code:			string alias for files
+	#	iteration:		int recurrent stage ID
+	#	flags:			string of CMD flags for ./nsga2.py		
+	#
 	def __init__(self, buildings, directory, code, iteration, flags=""):
 		super().__init__()
 		self.buildings	= buildings			# BuildingSet
 		self.directory	= directory			# string Directory where files are saved / read from
-		self.code		= directory + code	# string Alias for files. E.g
+		self.code		= directory + code	# string Alias for files. E
 		self.flags		= flags				# string nsga2.py command line parameters string
 		self.finished	= False				# bool process has finished
 		self.results	= False				# BuildingSet from .stt file. Same as BuildingSet NSGA2 selection in building.data

@@ -29,12 +29,15 @@ class NSGA2Community():
 		self.stateLabel			= stateLabel		# string used to separate recurrent step state outputs. Bit dirty, but I need it
 		self.buildingThreads	= []				# Active NSGA2ProcessingThread
 		self.finishedThreads	= []				# Finished NSGA2ProcessingThread
+		# TODO: This isn't a great place for this. Especially the relative path
 		if dataDirectory:							# Directory where files are saved
 			self.dataDirectory		= "./processing/" + dataDirectory
 		else:
 			self.dataDirectory		= "./processing/" + str(time()).replace(".", "") + "/"
+		# Make sure the path ends with a hyphen because it's the base of other paths
 		if not self.dataDirectory[-1] == "/":
 			self.dataDirectory += "/"
+		# The inequality objective for each thread: inqeulity / threads
 		if self.inequality:
 			self.flags["inequality"]	= int(self.inequality / self.partitions) + 1 # + 1 because int() is the same as floor()
 	##
@@ -114,6 +117,11 @@ class NSGA2Community():
 		self.results	= buildingSet
 	##
 	# Parse command line arguments: Extends RetrofitNSGA2.ParseCMD()
+	#
+	# output:	Dict of mixed value parameters
+	#
+	# Note: This is mega dirty with duplicated code. Needed a way to use -h consistently and this
+	# was the trade-off. EstimatorBase examples don't respond to -h but are more consistent. My bad.
 	##
 	@staticmethod
 	def ParseCMD():
