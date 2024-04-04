@@ -3,6 +3,7 @@
 from os.path			import isfile
 from pandas				import read_csv
 from hyperopt 			import fmin, tpe, Trials
+from numbers			import Number
 ## Project
 from lib.estimator_base	import EstimatorBase
 from lib.estimators		import *
@@ -34,7 +35,7 @@ def optimise(params):
 		#
 		# Anyway, that's why we're doing it here.
 		## 
-		value = int(params[key]) if int(params[key]) == params[key] else params[key]
+		value = int(params[key]) if isinstance(params[key], Number) and int(params[key]) == params[key] else params[key]
 		setattr(model, key, value)
 	model.train()
 	return model.test()["rmse"]
