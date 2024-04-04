@@ -23,7 +23,17 @@ model.useCMDParams		= False
 def optimise(params):
 	global model # Yeah, yeah. Boo global. Saves reloading the data everytime
 	for key in list(model.__class__.HYPEROPT_HP_TUNER_PARAMS):
-		# Because optimisation libraries can fathom anything that's not float64 when the give results
+		##
+		# Optimisation libraries usually pass float for regardless of the parameter
+		# type. Sometimes, they convert to int, if required, during iterations but 
+		# forget to when they return the selected parameters.
+		#
+		# NSGA-II is especially bad. During optimisation, it provides floored floats, then
+		# unrounded floats in the final population. Using round() gets the wrong result
+		# because int() is equivalent to int(floor(i)). 
+		#
+		# Anyway, that's why we're doing it here.
+		## 
 		value = int(params[key]) if int(params[key]) == params[key] else params[key]
 		setattr(model, key, value)
 	model.train()
