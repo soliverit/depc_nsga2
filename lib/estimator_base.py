@@ -19,15 +19,18 @@ class EstimatorBase():
 	##
 	@staticmethod
 	def GetConstructor():	
-		parser	= ArgumentParser("")
+		# Prase known args to get the constructor. XGBoost if undefined
+		parser		= ArgumentParser("")
 		parser.add_argument("--constructor", type=str, default="XGBoostEstimator", help="Anything from ./lib/estimators/ that doesn't have base in the name.")
-		args = parser.parse_known_args()
+		args 		= parser.parse_known_args()
 		constructor = vars(args[0])["constructor"]
+		# Map Estiamtor constructors
 		if len(__class__.CONSTRUCTORS) == 0:
 			module	= import_module("lib.estimators")
 			for name, obj in getmembers(module):
 				if isclass(obj) and issubclass(obj, __class__):
 					__class__.CONSTRUCTORS[name] = obj
+		# Return the Estimator constructor
 		return __class__.CONSTRUCTORS[constructor]
 	
 	@classmethod
@@ -50,7 +53,11 @@ class EstimatorBase():
 		self.applyScaler		= False				# bool apply scaler during preprocessing inputs
 		self.applyNormaliser	= False				# bool apply normaliser during preprocessing inputs
 		self.customParams		= customParams		# dict of params not covered by the default model
-
+	##
+	# Shuffle data
+	##
+	def shuffleData(self):
+		self.data	= self.data.sample(frac=1).reset_index(drop=True)
 	##
 	# Get training data  with target
 	#
@@ -68,7 +75,7 @@ class EstimatorBase():
 	def testData(self):
 		return self.data[int(len(self.data) * self.trainTestSplit) : ]
 	##
-	# Get training data  without targets
+	# Get training data  without targets + Preprocessing Standard/Normal etc
 	#
 	# output:	DataFrame of training data excluding targets, not test data
 	##
@@ -76,7 +83,7 @@ class EstimatorBase():
 	def trainingInputs(self):
 		data	= self.data[: int(len(self.data) * self.trainTestSplit)]
 		del data[self.target]
-		return data
+		return self.preprocessInputs(data)
 	##
 	# Get test data  without targets
 	#
@@ -138,7 +145,7 @@ class EstimatorBase():
 	##
 	@property
 	def params(self):
-		raise "%s doesn't override abstract params method of EstimatorBase" %(__class__.__name__)
+		raise Exception("%s doesn't override abstract params method of EstimatorBase" %(__class__.__name__))
 	##
 	# Get all params: self.params + self.customParams
 	##
