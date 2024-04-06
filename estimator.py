@@ -14,7 +14,7 @@ params		= constructor.ParseCMD()
 # Make sure the input exists
 if not isfile(params["data"]):
 	print("Error: input data path not found: %s" %(params["data"]))
-# Create model
+# Load data and create model
 model					= constructor.QuickLoad(params["data"], params["target"])
 model.trainTestSplit	= params["train_split"]
 # Yep, you can tell it to skip the parameters you defined because sometime's you don't want to type twice
@@ -23,7 +23,6 @@ if not params["skip_cmd_config"]:
 # Print config to console
 if not params["no_summary"]:
 	model.printModelConfig()
-# Load data
 # Train 
 model.train()
 # Test
