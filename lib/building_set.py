@@ -173,11 +173,10 @@ class BuildingSet():
 	def scoreState(self, state):
 		cost	= 0
 		points	= 0
-		for building in self.buildings:
-			retrofit	= building.getCheapestRetrofitToEfficiency(Building.ratingLowerBound("D"))
-			if retrofit:
-				cost 	+= retrofit.cost
-				points	+= retrofit.difference
+		for i in range(len(self.buildings)):
+			retrofit	= self.buildings[i].getRetrofit(state[i])
+			cost 	+= retrofit.cost
+			points	+= retrofit.difference
 		return {"cost": cost, "points": points}
 	##
 	# Get the number of EPC points required to raise all Buildings to the target rating.
