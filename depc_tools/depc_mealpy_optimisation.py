@@ -16,6 +16,22 @@ class DEPCMealPyOptimiser(MealPyOptimiserBase):
 	@property	# Forwarder for project context
 	def buildings(self):
 		return self.data
+	##
+	# Update a hyperparameter (Duck typing magic)
+	#
+	# HyperoptHpTunerBase has a method that updates hyperparameters. In some cases,
+	# it can just call setattr, like with NSGA-II, since the object has members that
+	# define the hyperparameters. However, this object doesn't know the hyperparameters
+	# because it doesn't extend MealPy constructors, it is passed one an a member. So, 
+	# we can't define the parameters as members. Instead, we use self.customParams.
+	#
+	# We can't use setattr() because it can't tell the difference between internal and 
+	# external declarations, so we use self.customParams to store hyperparameters.
+	#
+	# So... defining this method HyperoptHpTunerBase to use this method instead of setattr().
+	##
+	def updateHyperparameter(self, key, value):
+		self.customParams[key]	= value
 	def penalty(self, value):
 		if self.inequality	== -1:
 			return 0
