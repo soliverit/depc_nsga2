@@ -16,16 +16,25 @@ class MealPyOptimiserBase():
 		self.logPath		= logPath			# string path for log file
 		self.lastResult		= False				# Agent or whatever comes from the solver
 		self.inequality		= inequality		# int/float penalty objective
-		self.population		= population	# int population size
+		self.population		= population		# int population size
 		self.customParams	= customParams		# Dict of extra problem parameters. E.g obj_weights for multi-objective
 		self.lastResult		= False				# Last result from optimisation
 		self.algorithm		= algorithm			# The MealPy "magic" alogrithm of your choice. MUST DEFINE
+	##
+	# Lower bound of all variables (Virtual)
+	##
 	@property
 	def lowerBounds(self):
 		return [0.0 for i in range(self.data.length)]
+	##
+	# Upper bound of all variables (Abstract)
+	##
 	@property
 	def upperBounds(self):
 		raise Exception("%s doesn't override upperBounds property" %(__class__.__name__))
+	##
+	# Problem core definition: (Virtual but should return the current values)
+	##
 	@property
 	def problem(self):
 		return {
@@ -34,27 +43,40 @@ class MealPyOptimiserBase():
 			"minmax":	self.minMax,
 			"log_to":	self.logPath
 		}
+	##
+	# Merge default problem and customParam dictionaries (Final)
+	##
 	@property
 	def completeProblem(self):
 		problem	= self.problem
 		for key, value in self.customParams.items():
 			problem[key]	= value
 		return problem
+	##
+	# Score / fitness function (Abstract)
+	##
 	def score(self, solution):
 		raise Exception("%s doesn't override score()" %(__class__.__name__))
-	# def solve(self):
-	# 	raise Exception("%s doesn't override .solve()" %(__class__.__name__))
+	##
+	# Solve the problem (Final [ideally])
+	##
 	def solve(self):
 		self.solver			= self.algorithm(epoch=self.epochs, pop_size=self.population)
 		self.lastResult 	= self.solver.solve(self.completeProblem)
+	#####################
 	### Magic methods ###
-	def __setattr__(self, name, value):
-		if "customParams" not in self.__dict__:
-			self.__dict__["customParams"]	= {}
-		if name in self.__dict__["customParams"]: 
-			self.__dict__["customParams"][name]	= value
-		else:
-			self.__dict__[name]	= value
+	#####################
+	##
+	# Barrage: Try all the models
+	## 
+	def barrage(self, models=[]):
+		if not models:
+			models	= list(__class__.CONSTRCUTORS)
+		for model in models:
+			self.constructor	= model
+			self.solve()
+			result	= self.lastResult.target.objectives[0]
+			print("%s: %s" %(self.constructor, result))
 	################################################
 	# Class and static stuff
 	################################################
