@@ -1,14 +1,14 @@
 ### Includes ###
 ## Native 
 from typing 	import Any
-# from mealpy		import IntegerVar
+from mealpy		import IntegerVar
 from importlib	import import_module
 from pkgutil	import walk_packages
 from argparse	import ArgumentParser
 class MealPyOptimiserBase():
 	CONSTRCUTORS = {}
-	def __init__(self, data, epochs=100, minMax="min", varType=False, algorithm=False, 
-			  customParams={}, inequality=-1, populationSize=50, logPath=None):
+	def __init__(self, data, epochs=100, minMax="min", varType=IntegerVar, algorithm=False, 
+			  customParams={}, inequality=-1, population=50, logPath=None):
 		self.data			= data				# DatasetBase 
 		self.epochs			= epochs			# int number of epoch	
 		self.minMax			= minMax			# string [min]imise or [max]imise
@@ -16,7 +16,7 @@ class MealPyOptimiserBase():
 		self.logPath		= logPath			# string path for log file
 		self.lastResult		= False				# Agent or whatever comes from the solver
 		self.inequality		= inequality		# int/float penalty objective
-		self.populationSize	= populationSize	# int population size
+		self.population		= population	# int population size
 		self.customParams	= customParams		# Dict of extra problem parameters. E.g obj_weights for multi-objective
 		self.lastResult		= False				# Last result from optimisation
 		self.algorithm		= algorithm			# The MealPy "magic" alogrithm of your choice. MUST DEFINE
@@ -45,8 +45,8 @@ class MealPyOptimiserBase():
 	# def solve(self):
 	# 	raise Exception("%s doesn't override .solve()" %(__class__.__name__))
 	def solve(self):
-		self.solver			= self.algorithm(epoch=self.epochs, pop_size=self.populationSize)
-		self.lastResult 	=  self.solver.solve(self.completeProblem)
+		self.solver			= self.algorithm(epoch=self.epochs, pop_size=self.population)
+		self.lastResult 	= self.solver.solve(self.completeProblem)
 	### Magic methods ###
 	def __setattr__(self, name, value):
 		if "customParams" not in self.__dict__:
@@ -59,7 +59,7 @@ class MealPyOptimiserBase():
 	# Class and static stuff
 	################################################
 	@staticmethod
-	def GetConstructor(code):
+	def MapConstructors():
 		# Only load once
 		if not __class__.CONSTRCUTORS:
 			# Dynamically import the target package
@@ -73,13 +73,15 @@ class MealPyOptimiserBase():
 					attribute = getattr(module, attribute_name)
 					if isinstance(attribute, type) and "_based" in str(attribute.__module__):
 						__class__.CONSTRCUTORS[attribute.__name__] = attribute
-		return __class__.CONSTRCUTORS[code]
 	@staticmethod
 	def ParseCMD():
 		parser	= ArgumentParser()
-		parser.add_argument("--code", type=str, default="11k", help="Data alias: E.g '11k' points to ./data/11k.csv")
+		parser.add_argument("--data", type=str, required=True, help="Data alias: E.g '11k' points to ./data/11k.csv")
 		parser.add_argument("--constructor", type=str, default="OriginalGWO",help="Which MealPy optimisation algorithm? E.g OriginalGWO")
 		parser.add_argument("--population", type=int, default=50, help="Population size")
 		parser.add_argument("--epochs", type=int, default=50, help="No. epochs")
-		parser.add_argument("--partitions", type=int, default=2, help="No. partitions for MealPyCommunityOptimiserBase")
-		
+		parser.add_argument("--inequality", type=float, help="Minimum value of inequality property. E.g, minimum points improvement")
+		parser.add_argument("--results-path", type=str, help="Filepath to write result to.")
+		parser.add_argument("--target", type=str, help="Filepath to write result to.")
+		parser.add_argument("--silent", action="store_true", help="No console logging")
+		return vars(parser.parse_args())
