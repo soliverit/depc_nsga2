@@ -1,19 +1,17 @@
-# The Oliver-Rahimian-Seyedzadeh (ORS) retrofit analysis toolkit 
-A toolkit for dveloping machine learning models and optimisation algorithms large-scale retrofit analysis. Tailored for national domestic retrofit studies, designed to be adaptable for broader studies. 
+# DEPC strategy optimisation
+A toolkit for dveloping machine learning models and optimisation algorithms for large-scale retrofit analysis. Tailored for national domestic retrofit studies.
+## Problem statement
+You have an estate of 50,000 Each has up to 16 retrofit options representing every possible combination of 4 option: cavity wall insulation. Each building is below the acceptable EPC threshold, 40. Find the lowest cost strategy for increasing the overall EPC rating by the sum of the differences.
+### The solution space
+Each building has up to 16 retrofit options: the as-built state and all combinations of 4 retrofits: DHW boiler replacement, roof insulation, wall insulation, and window replacement.
 
+DHW boiler replacement, windows replacement, and roof insulation.
 ### Includes:
 - NSGA-II optimisation
 - NSGA-II recurrent, threaded subset optimisation
 - XGBoost and sklearn estimator wrappers
 - Hyperopt hyperparameter tuning for estimators and genetic algorithms
 - Bayesian-optimisation for genetic algorithms
-
-## Features
- - **NSGA2**: A nondominated sorting genetic algorithm for residential EPCs.
- - **NSGA2Community**: A fast, threaded subset optimisation algorithm. 
-## Summary
-Takes a csv of retrofits for multiple buildings and finds near-optimal strageies for improving the overall target score. 
-
 ### Features
 `nsga2.py` The NSGA-II that optimises datasets as a whole
 
