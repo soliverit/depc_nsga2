@@ -15,7 +15,7 @@ DHW boiler replacement, windows replacement, and roof insulation.
 ### Features
 `nsga2.py` The NSGA-II that optimises datasets as a whole
 
-`nsga2_community.py` The script that processes datasets in subsets
+`nsga2_community.py` The script that parallel processes datasets in subsets
 
 `nsga2_bayes_hp_tuner.py` A Bayesian optimisiation process for tuning NSGA-II hyperparameters.
 
