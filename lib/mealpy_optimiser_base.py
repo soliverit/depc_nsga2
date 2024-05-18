@@ -1,13 +1,15 @@
 ### Includes ###
 ## Native 
 from typing 	import Any
-from mealpy		import IntegerVar
+from mealpy		import IntegerVar, FloatVar
 from importlib	import import_module
 from pkgutil	import walk_packages
 from argparse	import ArgumentParser
 class MealPyOptimiserBase():
 	CONSTRCUTORS = {}
-	def __init__(self, data, epochs=100, minMax="min", varType=IntegerVar, algorithm=False, 
+	FLOAT_VAR	= FloatVar
+	INTEGER_VAR	= IntegerVar
+	def __init__(self, data=False, epochs=100, minMax="min", varType=IntegerVar, algorithm=False, 
 			  customParams={}, inequality=-1, population=50, logPath=None):
 		self.data			= data				# DatasetBase 
 		self.epochs			= epochs			# int number of epoch	
@@ -69,14 +71,39 @@ class MealPyOptimiserBase():
 	##
 	# Barrage: Try all the models
 	## 
-	def barrage(self, models=[]):
+	def barrage(self, models=False):
+		from colorama	import init, Fore, Style
+		init()
+		__class__.MapConstructors()
+		del __class__.CONSTRCUTORS["WMQIMRFO"]
+		del __class__.CONSTRCUTORS["OriginalICA"]
+		del __class__.CONSTRCUTORS["QTable"]
 		if not models:
 			models	= list(__class__.CONSTRCUTORS)
+		results		= []
+		best		= 99999999999
+		bestModel	= False
 		for model in models:
-			self.constructor	= model
-			self.solve()
-			result	= self.lastResult.target.objectives[0]
-			print("%s: %s" %(self.constructor, result))
+			self.algorithm	= __class__.CONSTRCUTORS[model]
+			while len(model) < 18:
+				model += " "
+			try:
+				self.solve()
+				result	= self.lastResult.target.objectives[0]
+				results[model]	= result
+				if result <= best:		
+					if result == best:
+						print("%s%s: %s%s" %(Fore.YELLOW, model, result, Style.RESET_ALL))
+					else:
+						print("%s%s: %s%s" %(Fore.GREEN, model, result, Style.RESET_ALL))
+					best 		= result
+					bestModel	= model
+				else:
+					print("%s: %s" %(model, result))
+			except:
+				print("%s: No solution " %(model))
+		
+		return bestModel
 	################################################
 	# Class and static stuff
 	################################################

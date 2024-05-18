@@ -50,8 +50,8 @@ def optimise(params):
 # Define the NSGA parameters that'are being tuned. These are for PM crossover and SBX mutation
 bounds	= {
 	"crossoverProb":	hp.uniform("crossoverProb", 0.7,0.9),
-	"crossoverETA":		hp.uniform("crossoverETA", 10, 25),
-	"mutationETA": 		hp.uniform("mutationETA", 5, 10)
+	"crossoverETA":		hp.uniform("crossoverETA", 5, 20),
+	"mutationETA": 		hp.uniform("mutationETA", 3, 10)
 }
 # Define the optimiser
 
@@ -62,7 +62,7 @@ algo = tpe.suggest
 trials = Trials()
 
 # Run the optimization
-best = fmin(optimise, bounds, algo=algo, max_evals=100, trials=trials)
+best = fmin(optimise, bounds, algo=algo, max_evals=200, trials=trials)
 
 print("Best parameters:", best)
 

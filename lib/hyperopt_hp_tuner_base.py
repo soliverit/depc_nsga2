@@ -6,7 +6,7 @@ from numbers		import Number
 from numpy			import average
 ## Project
 class HyperoptHpTunerBase():
-	def __init__(self, model, iterations=10, parameters={}, 
+	def __init__(self, model, iterations=20, parameters={}, 
 			  algorithm=tpe.suggest, trials=Trials(), cvSteps=1):
 		self.model		= model				# Anything we can tune using setattr to modify params
 		self.iterations	= iterations		# int number of stages in the tuning process
@@ -38,7 +38,10 @@ class HyperoptHpTunerBase():
 	def _score(self, params):
 		# Update the model
 		for key, value in params.items():
-			setattr(self.model, key, __class__.CastValueToExpceted(value))
+			if hasattr(self.model, "updateHyperparameter"):
+				self.model.updateHyperparameters(key, value)
+			else:
+				setattr(self.model, key, __class__.CastValueToExpceted(value))
 		results = []
 		# Do score with cross-validation
 		for i in range(self.cvSteps):
@@ -46,14 +49,23 @@ class HyperoptHpTunerBase():
 				self.intermediaryModelChanges()
 			results.append(self.evaluate())
 		return average(results)
+	##
+	# Intermediary actions between cross-validation steps (Virtual)
+	#
+	# Do things to the data or whatever before the next step of cross validation. E.g, 
+ 	# shuffle / repartition data
+	##
 	def intermediaryModelChanges(self):
 		pass
+	##
+	# Tune the model: Find the best hyperparameters (Final)
+	##
 	def tune(self):
 		self.best = fmin(
 			self._score, 
 			self.parameters, 
 			algo=tpe.suggest,
-			max_evals=100, 
+			max_evals=self.iterations, 
 			trials=Trials()
 		)
 	##
@@ -68,6 +80,8 @@ class HyperoptHpTunerBase():
 	############
 	# Adding hyperparameters
 	############
+	def addParameter(self, code, parameter):
+		self.parameters[code]	= parameter
 	def addUniformParameter(self, code, min, max):
 		self.parameters[code]	= uniform(code, min, max)
 	def addUniformIntParameter(self, code, min, max):

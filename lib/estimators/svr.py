@@ -20,6 +20,5 @@ class SVREstimator(EstimatorBase):
 	def params(self):
 		return {"C": self.C, "epsilon": self.epsilon}
 	def train(self):
-		data		= self.preprocessInputs(self.trainingInputs)
 		self.model	= SVR(**self.allParams)
-		self.model.fit(data, self.trainingTargets)
+		self.model.fit(self.trainingInputs, self.trainingTargets)

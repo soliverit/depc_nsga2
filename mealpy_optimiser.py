@@ -46,7 +46,8 @@ optimiser	= DEPCMealPyOptimiser(buildings,
 	population=	params["population"],
 	algorithm=	constructor
 )
-
+optimiser.barrage()
+exit()
 optimiser.solve()
 print("%s: %s" %(constructor.__name__, optimiser.lastResult.target.objectives[0] ))
 if params["results_path"]:
