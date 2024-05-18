@@ -42,7 +42,7 @@ Output from running `python nsga2.py  --code 11k --gen 10000 --population 100 --
 
 
 # Command line arguments and data formats
-## RetrofitNSGA1 and NSGA2Community command line arguments
+## RetrofitNSGA2 and NSGA2Community command line arguments
 ### Command line parameters (./nsga2.py)
 `--code` Input file code: The name of a file in `./data/`. E.g, `mid` points to `./data/mid.csv` or `my_project/initial` to `./data/my_project/initial`
 
