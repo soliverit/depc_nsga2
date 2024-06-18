@@ -39,8 +39,12 @@ class DEPCMealPyOptimiser(MealPyOptimiserBase):
 	def score(self, solution):	# Overriden Abstract
 		cost 		= 0
 		difference	= 0
+		# windowCount	= 0
 		for i in range(len(self.data)):
 			retrofit 	= self.buildings[i].getRetrofit(int(solution[i]))
 			cost 		+= retrofit.cost
 			difference	+= retrofit.difference
+			# if retrofit.hasHotwater:
+			# 	windowCount	+= 1
 		return [cost / difference, self.penalty(difference)]
+		# return [cost / difference, self.penalty(difference), (	float(windowCount) / len(self.data)) * 100]

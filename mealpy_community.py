@@ -15,7 +15,7 @@ MealPyOptimiserBase.MapConstructors()
 
 params		= MealPyCommunityOptimiser.ParseCMD()
 dataPath	= params["data"]
-buildings	= BuildingSet.LoadDataSet(dataPath).getByRatings(["G", "F", "E"])
+buildings	= BuildingSet.LoadDataSet(dataPath).getByRatings(["G", "F"])
 inequality	= buildings.toRatingDifference(params["target"])
 optimiser	= MealPyCommunityOptimiser(
 	buildings=		buildings,
@@ -25,7 +25,8 @@ optimiser	= MealPyCommunityOptimiser(
 	resultsPath=	params["results_path"],
 	partitions=		params["partitions"],
 	threads=		params["threads"],
-	processingPath=	params["processing_path"]
+	processingPath=	params["processing_path"],
+	alias=			params["data"].replace("c:/workspaces/__sandbox__/depc_england/", "").replace("/retrofits.csv", "")
 )
 
 # Verify
@@ -34,4 +35,3 @@ optimiser	= MealPyCommunityOptimiser(
 #############################
 startTime	= time() 
 optimiser.run()
-print("Community process time: %s" %(time() - startTime))

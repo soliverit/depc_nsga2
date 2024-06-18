@@ -50,7 +50,7 @@ class MealPyOptimiserBase():
 	##
 	@property
 	def completeProblem(self):
-		problem	= self.problem
+		problem	= self.problem.copy()
 		for key, value in self.customParams.items():
 			problem[key]	= value
 		return problem
@@ -133,4 +133,5 @@ class MealPyOptimiserBase():
 		parser.add_argument("--results-path", type=str, help="Filepath to write result to.")
 		parser.add_argument("--target", type=str, help="Filepath to write result to.")
 		parser.add_argument("--silent", action="store_true", help="No console logging")
+		parser.add_argument("--alias", type=str, default="", help="Name for the process")
 		return vars(parser.parse_args())

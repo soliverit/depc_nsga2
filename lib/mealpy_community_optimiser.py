@@ -10,7 +10,7 @@ from lib.mealpy_process_thread	import MealPyProcessThread
 # MealPy Community Optimiser: Threaded ,recurrent MealPy optimisation
 ## 
 class MealPyCommunityOptimiser():
-	def __init__(self, buildings, constructor, epochs, population, processingPath, resultsPath, threads=2, partitions=2):
+	def __init__(self, buildings, constructor, epochs, population, processingPath, resultsPath, threads=2, partitions=2, alias="."):
 		self.buildings			= buildings
 		self.constructor		= constructor
 		self.epochs				= epochs
@@ -19,6 +19,7 @@ class MealPyCommunityOptimiser():
 		self.processingPath		= processingPath
 		self.threads			= threads
 		self.partitions			= partitions
+		self.alias				= alias
 		self.activeThreads		= []
 		self.finishedThreads	= []
 	def run(self):
@@ -66,7 +67,7 @@ class MealPyCommunityOptimiser():
 						buildingSets.pop(),
 						dataPath="%s%s.csv" %(self.processingPath, str(counter)),
 						resultsPath=self.resultsPath,
-						flags= " --epochs %s --population %s --silent" %(self.epochs, self.population)
+						flags= "--alias %s --epochs %s --population %s --silent" %(self.alias + "-" + str(counter), self.epochs, self.population)
 					)
 					buildingThread.start()
 					self.buildingThreads.append(buildingThread)

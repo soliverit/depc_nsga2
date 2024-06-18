@@ -90,13 +90,13 @@ class Building():
 		if retrofit.efficiency != -1:
 			if retrofit.efficiency > self.efficiency: 
 				self.retrofits.append(retrofit)
-			# We keep everything in case we need it because even though
-			# some Retrofit have a point difference < 1 in isolation, they
-			# might have a synergistic relationship with others. It's EPC, 
-			# so counterintuitive synergies aren't off the table.
-			self.retrofitHash[retrofit.name]	= retrofit
+		# We keep everything in case we need it because even though
+		# some Retrofit have a point difference < 1 in isolation, they
+		# might have a synergistic relationship with others. It's EPC, 
+		# so counterintuitive synergies aren't off the table.
+		self.retrofitHash[retrofit.name]	= retrofit
 	##
-	# Remov Retrofits with a cost and ratio greater than the inputs
+	# Remove Retrofits with a cost and ratio greater than the inputs
 	#
 	# Params:
 	#	threshold:	float cost / point difference max value. Delete Retrofit if higher
